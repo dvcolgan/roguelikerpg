@@ -1,8 +1,8 @@
 local Superflux = {}
 
 
-function string.startsWith(String,Start)
-   return string.sub(String,1,string.len(Start))==Start
+function startsWith(str, start)
+   return string.sub(str, 1, str.len(start)) == start
 end
 
 
@@ -15,7 +15,7 @@ function Superflux.new()
     function flux.createStore(fns)
         for key, value in pairs(fns) do
             -- Register functions in the spec as listeners if they start with 'on'
-            if type(value) == 'function' and string.startsWith(key, 'on') then
+            if type(value) == 'function' and startsWith(key, 'on') then
                 -- Extract the action name from the function name:
                 -- onCreateTodo -> createTodo
                 local actionName = string.lower(string.sub(key, 3, 3)) .. string.sub(key, 4)
