@@ -1,4 +1,4 @@
-local Superflux = {}
+local Engine = {}
 
 
 function startsWith(str, start)
@@ -6,13 +6,13 @@ function startsWith(str, start)
 end
 
 
-function Superflux.new()
-    local flux = {}
-    flux.actions = {}
-    flux.stores = {}
-    flux.callbacks = {}
+function Engine.new()
+    local engine = {}
+    engine.events = {}
+    engine.stores = {}
+    engine.callbacks = {}
 
-    function flux.createStore(fns)
+    function engine.createStore(fns)
         for key, value in pairs(fns) do
             -- Register functions in the spec as listeners if they start with 'on'
             if type(value) == 'function' and startsWith(key, 'on') then
@@ -20,10 +20,10 @@ function Superflux.new()
                 -- onCreateTodo -> createTodo
                 local actionName = string.lower(string.sub(key, 3, 3)) .. string.sub(key, 4)
 
-                if flux.callbacks[actionName] == nil then
-                    flux.callbacks[actionName] = {}
+                if engine.callbacks[actionName] == nil then
+                    engine.callbacks[actionName] = {}
                 end
-                table.insert(flux.callbacks[actionName], function(...)
+                table.insert(engine.callbacks[actionName], function(...)
                     value(fns, ...)
                 end)
             end
@@ -37,10 +37,10 @@ function Superflux.new()
         return fns
     end
 
-    function flux.createActions(actions)
-        for i, action in ipairs(actions) do
-            flux.actions[action] = function(...)
-                local callbacks = flux.callbacks[action]
+    function engine.createEvents(events)
+        for i, action in ipairs(events) do
+            engine.events[action] = function(...)
+                local callbacks = engine.callbacks[action]
                 if callbacks then
                     for j, callback in ipairs(callbacks) do
                         callback(...)
@@ -48,10 +48,10 @@ function Superflux.new()
                 end
             end
         end
-        return flux.actions
+        return engine.events
     end
 
-    return flux
+    return engine
 end
 
-return Superflux
+return Engine

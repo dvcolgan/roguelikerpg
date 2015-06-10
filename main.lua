@@ -1,5 +1,5 @@
-local stores = require('stores')
-local actions = require('actions')
+local playerStore = require('stores/player')
+local events = require('events')
 
 
 function drawPlayer(player)
@@ -12,7 +12,7 @@ end
 
 
 function love.draw()
-    drawPlayer(stores.player.player)
+    drawPlayer(playerStore.player)
 end
 
 
@@ -20,16 +20,16 @@ function love.keypressed(key)
     if key == 'escape' then
         love.event.quit()
     else
-        actions.keyDown(key)
+        events.keyDown(key)
     end
 end
 
 
 function love.keyreleased(key)
-    actions.keyUp(key)
+    events.keyUp(key)
 end
 
 
 function love.update(dt)
-    actions.update(dt)
+    events.update(dt)
 end
