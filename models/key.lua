@@ -3,7 +3,8 @@ local class = require('middleclass')
 
 local Key = class('Key')
 
-function Key:initialize()
+function Key:initialize(engine)
+    self.engine = engine
     self.states = {
         a=false,
         o=false,

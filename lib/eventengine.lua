@@ -12,7 +12,15 @@ end
 
 function Engine:addModels(modelClasses)
     for name, modelClass in pairs(modelClasses) do
-        self.models[name] = modelClass:new(models)
+        self.models[name] = modelClass:new(self)
+    end
+end
+
+function Engine:addStates(stateClasses)
+    for name, stateClass in pairs(stateClasses) do
+        local state = stateClass:new(self)
+        state:create()
+        self.states[name] = state
     end
 end
 
@@ -37,21 +45,25 @@ function Engine:pump()
     end
 end
 
-function Engine:trigger(...)
-    table.insert(self.queue, ...)
+function Engine:trigger(eventName,
+        arg1, arg2, arg3, arg4, arg5)
+    table.insert(self.queue, {
+        eventName,
+        arg1, arg2, arg3, arg4, arg5
+    })
 end
 
 function Engine:update(dt)
-    self.trigger('update', dt)
+    self:trigger('update', dt)
     self:pump()
 
-    for i, state in ipairs(self.states) do
+    for name, state in pairs(self.states) do
         state:update(dt)
     end
 end
 
 function Engine:draw()
-    for i, state in ipairs(self.states) do
+    for name, state in pairs(self.states) do
         state:draw()
     end
 end

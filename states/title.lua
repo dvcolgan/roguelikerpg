@@ -1,9 +1,11 @@
+local class = require('middleclass')
 local GameState = require('lib/state')
 
 
 local TitleState = class('TitleState', GameState)
 
-function TitleState:create()
+function TitleState:create(engine)
+    self.engine = engine
     self.speed=300
     self.x=0
     self.y=0
@@ -39,3 +41,5 @@ function TitleState:draw()
     love.graphics.setColor(0, 255, 0, 255)
     love.graphics.print('This is the Title Screen', self.x, self.y)
 end
+
+return TitleState
