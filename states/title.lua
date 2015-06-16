@@ -1,38 +1,41 @@
-return {
-    vm={
-        speed=300,
-        x=0,
-        y=0,
-        dx=1,
-        dy=1,
-    },
+local GameState = require('lib/state')
 
-    update=function(dt, vm)
-        vm.x = vm.x + vm.speed * dt * vm.dx
-        vm.y = vm.y + vm.speed * dt * vm.dy
-        local width = love.window.getWidth()
-        local height = love.window.getHeight()
 
-        if vm.x > width then
-            vm.x = width - 1
-            vm.dx = -vm.dx
-        end
-        if vm.y > height then
-            vm.y = height - 1
-            vm.dy = -vm.dy
-        end
-        if vm.x < 0 then
-            vm.x = 1
-            vm.dx = -vm.dx
-        end
-        if vm.y < 0 then
-            vm.y = 1
-            vm.dy = -vm.dy
-        end
-    end,
+local TitleState = class('TitleState', GameState)
 
-    draw=function(vm)
-        love.graphics.setColor(0, 255, 0, 255)
-        love.graphics.print('This is the Title Screen', vm.x, vm.y)
-    end,
-}
+function TitleState:create()
+    self.speed=300
+    self.x=0
+    self.y=0
+    self.dx=1
+    self.dy=1
+end
+
+function TitleState:update(dt)
+    self.x = self.x + self.speed * dt * self.dx
+    self.y = self.y + self.speed * dt * self.dy
+    local width = love.window.getWidth()
+    local height = love.window.getHeight()
+
+    if self.x > width then
+        self.x = width - 1
+        self.dx = -self.dx
+    end
+    if self.y > height then
+        self.y = height - 1
+        self.dy = -self.dy
+    end
+    if self.x < 0 then
+        self.x = 1
+        self.dx = -self.dx
+    end
+    if self.y < 0 then
+        self.y = 1
+        self.dy = -self.dy
+    end
+end
+
+function TitleState:draw()
+    love.graphics.setColor(0, 255, 0, 255)
+    love.graphics.print('This is the Title Screen', self.x, self.y)
+end
