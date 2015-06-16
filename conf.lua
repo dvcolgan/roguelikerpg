@@ -1,7 +1,8 @@
 function love.conf(t)
+    io.stdout:setvbuf("no")
     t.identity = "roguelike"
     t.version = "0.9.2"
-    t.console = true
+    t.console = false
 
     t.window.title = "Roguelike"
     t.window.icon = nil

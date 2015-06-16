@@ -12,16 +12,15 @@ return engine.createStore({
             right=false,
             up=false,
             down=false,
+            space=false,
         }
     end,
 
     onKeyDown = function(self, key)
-        if key == ',' then key = 'comma' end
         self.states[key] = true
     end,
 
     onKeyUp = function(self, key)
-        if key == ',' then key = 'comma' end
         self.states[key] = false
     end,
 })

@@ -12,7 +12,7 @@ function Engine.new()
     engine.stores = {}
     engine.callbacks = {}
 
-    function engine.createStore(fns)
+    function engine.createEntity(fns)
         for key, value in pairs(fns) do
             -- Register functions in the spec as listeners if they start with 'on'
             if type(value) == 'function' and startsWith(key, 'on') then

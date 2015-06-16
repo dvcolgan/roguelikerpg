@@ -1,0 +1,95 @@
+tile system
+
+camera
+
+player
+
+states
+
+
+The Title State
+    press spacebar to go to the overworld
+
+The Overworld State
+    move around with the player object
+
+The Store/Inn State
+    the overworld is still running underneath
+    shows an overlay of a store on top
+
+Pause any of these
+
+Inventory screen
+    Zelda-style inventory slide up system
+
+
+State Object
+    contains entities
+    has a draw function
+
+
+Inventory
+Store
+need access to Player data
+
+Singleton data store thingy
+
+State
+    create:
+        set up data for this state
+        the state could have data that is view model data
+    draw()
+
+
+Domain objects:
+    read only from the renderer's perspective
+    listen for events, event handlers can change things
+
+    player
+        x
+        y
+        color
+        onUpdate
+            check to see keys and move x, y
+
+    key
+        onkeypress in the system
+        states
+            left
+            right
+            up
+            down
+
+    inventory
+        onGetItem(item)
+            items.push(item)
+        active item
+        items
+
+    tilemap
+        onTileSectorNeeded
+        tiles
+
+    camera
+        onUpdate
+            follow the currently targeted thing
+        
+    npcs
+
+
+
+State objects:
+    title screen
+        render:
+            draw text on the screen
+
+    overworld
+        render:
+            draw map
+            draw player
+
+    store
+
+    inventory
+        draw inventory background
+        draw each item on top of things

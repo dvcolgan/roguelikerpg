@@ -5,4 +5,5 @@ return engine.createEvents({
     'keyDown',
     'keyUp',
     'update',
+    'stateChange',
 })

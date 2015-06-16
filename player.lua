@@ -1,18 +1,16 @@
-local engine = require('engine')
-local keyStore = require('stores/key')
+local Player = {}
 
 
-function createPlayer()
-    return {
-        x=0,
-        y=0,
-    }
+function Player.new(x, y)
+    self.x = x
+    self.y = y
 end
 
+engine.createEntity
 
-return engine.createStore({
     init = function(self)
-        self.player = createPlayer()
+        self.x = 0
+        self.y = 0
     end,
 
     onUpdate = function(self, dt)
