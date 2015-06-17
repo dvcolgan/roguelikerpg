@@ -1,0 +1,6 @@
+add shooting
+add enemies
+add npcs
+add dialog
+add inventory
+add animations

@@ -11,17 +11,33 @@ end
 function OverworldState:draw()
     self:drawTileMap()
     self:drawPlayer()
+    self:drawBullets()
 end
 
 function OverworldState:drawPlayer()
     local player = self.engine.models.player
     local camera = self.engine.models.camera
+    love.graphics.setColor(255, 255, 255, 255)
     love.graphics.rectangle(
         'fill',
         player.x - camera.scroll.x,
         player.y - camera.scroll.y,
         32, 32
     )
+end
+
+function OverworldState:drawBullets()
+    local bulletManager = self.engine.models.bulletManager
+    local camera = self.engine.models.camera
+    love.graphics.setColor(255, 0, 0, 255)
+    for i, bullet in ipairs(bulletManager.bullets) do
+        love.graphics.rectangle(
+            'fill',
+            bullet.x - camera.scroll.x,
+            bullet.y - camera.scroll.y,
+            8, 8
+        )
+    end
 end
 
 function OverworldState:drawTileMap()
