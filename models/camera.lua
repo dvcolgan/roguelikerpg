@@ -1,4 +1,5 @@
 local class = require('middleclass')
+local G = require('constants')
 
 
 local Camera = class('Camera')
@@ -28,19 +29,10 @@ end
 
 function Camera:getOnScreenTileBounds()
     return {
-        xMin=math.floor(self.scroll.x / self.tileSize),
-        yMin=math.floor(self.scroll.y / self.tileSize),
-        xMax=math.ceil((self.scroll.x + self.width) / self.tileSize) - 1,
-        yMax=math.ceil((self.scroll.y + self.height) / self.tileSize) - 1,
-    }
-end
-
-function Camera:getOnScreenSectorBounds()
-    return {
-        xMin=math.floor(self.scroll.x / (self.tileSize * G.SECTOR_SIZE)),
-        yMin=math.floor(self.scroll.y / (self.tileSize * G.SECTOR_SIZE)),
-        xMax=math.ceil((self.scroll.x + self.width) / (self.tileSize * G.SECTOR_SIZE)) - 1,
-        yMax=math.ceil((self.scroll.y + self.height) / (self.tileSize * G.SECTOR_SIZE)) - 1,
+        colMin=math.floor(self.scroll.x / G.TILE_SIZE),
+        rowMin=math.floor(self.scroll.y / G.TILE_SIZE),
+        colMax=math.ceil((self.scroll.x + self.width) / G.TILE_SIZE) - 1,
+        rowMax=math.ceil((self.scroll.y + self.height) / G.TILE_SIZE) - 1,
     }
 end
 

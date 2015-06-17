@@ -8,6 +8,11 @@ function Engine:initialize()
     self.queue = {}
     self.states = {}
     self.models = {}
+    self.images = {}
+end
+
+function Engine:addImage(name, texture)
+    self.images[name] = texture
 end
 
 function Engine:addModels(modelClasses)
