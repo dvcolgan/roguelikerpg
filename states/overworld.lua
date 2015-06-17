@@ -9,11 +9,26 @@ function OverworldState:create()
 end
 
 function OverworldState:draw()
+    self:drawTileMap()
+    self:drawPlayer()
+end
+
+function OverworldState:drawPlayer()
     local player = self.engine.models.player
     local camera = self.engine.models.camera
+    love.graphics.rectangle(
+        'fill',
+        player.x - camera.scroll.x,
+        player.y - camera.scroll.y,
+        32, 32
+    )
+end
 
-    tilesheet = self.engine.images.tilesheet
-    map = self.engine.models.map
+function OverworldState:drawTileMap()
+    local player = self.engine.models.player
+    local camera = self.engine.models.camera
+    local tilesheet = self.engine.images.tilesheet
+    local map = self.engine.models.map
 
     love.graphics.setColor(255, 255, 255, 255)
     local bounds = camera:getOnScreenTileBounds()
@@ -30,14 +45,6 @@ function OverworldState:draw()
             end
         end
     end
-
-    love.graphics.rectangle(
-        'fill',
-        player.x - camera.scroll.x,
-        player.y - camera.scroll.y,
-        32, 32
-    )
-
 end
 
 return OverworldState
