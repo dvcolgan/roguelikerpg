@@ -24,9 +24,21 @@ function Engine:addStates(stateClasses)
     end
 end
 
+function Engine:setState(stateName, changes)
+    local state = self.states[stateName]
+    if changes.doUpdate ~= nil then
+        state.doUpdate = changes.doUpdate
+    end
+    if changes.doDraw ~= nil then
+        state.doDraw = changes.doDraw
+    end
+end
+
 function Engine:pump()
     local queue = self.queue
     self.queue = {}
+
+    local nextState = nil
 
     for i, event in ipairs(queue) do
         local eventName = event[1]
@@ -37,9 +49,13 @@ function Engine:pump()
         local arg4 = event[5]
         local arg5 = event[6]
 
-        for model in ipairs(self.models) do
+        if eventName == '' then
+            nextState = arg1
+        end
+
+        for name, model in pairs(self.models) do
             if model[callbackName] then
-                model[callbackName](arg1, arg2, arg3, arg4, arg5)
+                model[callbackName](model, arg1, arg2, arg3, arg4, arg5)
             end
         end
     end
@@ -58,13 +74,17 @@ function Engine:update(dt)
     self:pump()
 
     for name, state in pairs(self.states) do
-        state:update(dt)
+        if state.doUpdate then
+            state:update(dt)
+        end
     end
 end
 
 function Engine:draw()
     for name, state in pairs(self.states) do
-        state:draw()
+        if state.doDraw then
+            state:draw()
+        end
     end
 end
 

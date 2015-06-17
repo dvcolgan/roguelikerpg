@@ -4,8 +4,7 @@ local GameState = require('lib/state')
 
 local TitleState = class('TitleState', GameState)
 
-function TitleState:create(engine)
-    self.engine = engine
+function TitleState:create()
     self.speed=300
     self.x=0
     self.y=0
@@ -34,6 +33,11 @@ function TitleState:update(dt)
     if self.y < 0 then
         self.y = 1
         self.dy = -self.dy
+    end
+
+    if self.engine.models.key.states.space then
+        self.engine:setState('title', {doUpdate=false, doDraw=false})
+        self.engine:setState('overworld', {doUpdate=true, doDraw=true})
     end
 end
 

@@ -11,26 +11,26 @@ function Player:initialize(engine)
     self.speed = 200
 end
 
-function onUpdate(dt)
+function Player:onUpdate(dt)
     speed = dt * self.speed
     states = self.engine.models.key.states
     if states.left or states.a then
-        self.player.x = self.player.x - speed
+        self.x = self.x - speed
     end
     if states.right or states.e then
-        self.player.x = self.player.x + speed
+        self.x = self.x + speed
     end
     if states.up or states.comma then
-        self.player.y = self.player.y - speed
+        self.y = self.y - speed
     end
     if states.down or states.o then
-        self.player.y = self.player.y + speed
+        self.y = self.y + speed
     end
 end
 
-function onKeyDown(key)
+function Player:onKeyDown(key)
     if key == 'space' then
-        engine.fire(self)
+        --engine.fire(self)
     end
 end
 

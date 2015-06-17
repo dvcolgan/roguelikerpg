@@ -6,7 +6,7 @@ local GameState = class('GameState')
 function GameState:initialize(engine)
     self.engine = engine
     self.doUpdate = false
-    self.doRender = false
+    self.doDraw = false
 end
 
 function GameState:create()
