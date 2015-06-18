@@ -14,9 +14,11 @@ function Player:initialize(engine)
     self.acceleration = 30
     self.drag = 30
     self.maxSpeed = 3
+    self.frozen = false
 end
 
 function Player:onUpdate(dt)
+    if self.frozen then return end
     local acc = self.acceleration * dt
     local drag = self.drag * dt
     states = self.engine.models.key.states
@@ -92,12 +94,30 @@ function Player:onUpdate(dt)
 end
 
 function Player:onKeyDown(key)
-    if (key == 'left' or
-            key == 'right' or
-            key == 'up' or
-            key == 'down') then
-        engine:trigger('fire', self, key)
+    if not self.frozen then
+        if (key == 'left' or
+                key == 'right' or
+                key == 'up' or
+                key == 'down') then
+            engine:trigger('fire', self, key)
+        end
     end
+end
+
+function Player:onTakeAwayControls()
+    self.frozen = true
+end
+
+function Player:onGiveBackControls()
+    self.frozen = false
+end
+
+function Player:serialize()
+    return { x = player.x, y = player.y }
+end
+function Player:deserialize(player)
+    self.x = player.x
+    self.y = player.y
 end
 
 return Player

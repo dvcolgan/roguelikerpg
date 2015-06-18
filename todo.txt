@@ -2,6 +2,7 @@ add shooting
 add enemies
 add npcs
 add dialog
+add collision with the map
 add inventory
 add animations
 fix the bug on the market map screen (off by one with quads?)

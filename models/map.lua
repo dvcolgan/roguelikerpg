@@ -1,16 +1,18 @@
 local class = require('middleclass')
 local G = require('constants')
-local testMap = require('levels/test')
 
 
 local Map = class('Map')
 
+
 function Map:initialize(engine)
-    self.rooms = {
-        ['0x0'] = require('levels/crossroads'),
-        ['1x0'] = require('levels/market'),
-        ['0x-1'] = require('levels/shores'),
-    }
+    self.rooms = {}
+    roomFileNames = love.filesystem.getDirectoryItems('levels/test')
+    for i, room in ipairs(roomFileNames) do
+        _, _, roomName = string.find(room, '_(.-).lua')
+        requirePath = 'levels/test/' .. string.gsub(room, '.lua', '')
+        self.rooms[roomName] = require(requirePath)
+    end
     self.roomX = 0
     self.roomY = 0
 
@@ -48,10 +50,7 @@ function Map:onRoomChange(dx, dy)
     local key = tostring(self.roomX) .. 'x' .. tostring(self.roomY)
     if self.rooms[key] then
         local mapData = self.rooms[key]
-        self.layers = {}
-        for i, layer in ipairs(mapData.layers) do
-            table.insert(self.layers, layer.data)
-        end
+        self.layers = mapData.layers
     end
 end
 
