@@ -1,4 +1,5 @@
 local class = require('middleclass')
+local G = require('constants')
 
 
 local Player = class('Player')
@@ -70,6 +71,24 @@ function Player:onUpdate(dt)
     -- Apply speed
     self.x = self.x + self.dx
     self.y = self.y + self.dy
+
+    -- Check if offscreen
+    if self.x > G.ROOM_WIDTH * G.TILE_SIZE then
+        self.engine:trigger('roomChange', 1, 0)
+        self.x = 0
+    end
+    if self.x < 0 then
+        self.engine:trigger('roomChange', -1, 0)
+        self.x = G.ROOM_WIDTH * G.TILE_SIZE - 1
+    end
+    if self.y > G.ROOM_HEIGHT * G.TILE_SIZE then
+        self.engine:trigger('roomChange', 0, 1)
+        self.y = 0
+    end
+    if self.y < 0 then
+        self.engine:trigger('roomChange', 0, -1)
+        self.y = G.ROOM_HEIGHT * G.TILE_SIZE - 1
+    end
 end
 
 function Player:onKeyDown(key)

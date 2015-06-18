@@ -8,7 +8,6 @@ function love.load()
         player=require('models/player'),
         key=require('models/key'),
         bulletManager=require('models/bullet-manager'),
-        camera=require('models/camera'),
         map=require('models/map'),
     })
     engine:addStates({
@@ -43,5 +42,5 @@ end
 function love.keyreleased(key)
     if key == ' ' then key = 'space' end
     if key == ',' then key = 'comma' end
-        engine:trigger('keyUp', key)
+    engine:trigger('keyUp', key)
 end

@@ -6,6 +6,7 @@ local G = require('constants')
 local OverworldState = class('OverworldState', GameState)
 
 function OverworldState:create()
+    self.engine:trigger('roomChange', 0, 0)
 end
 
 function OverworldState:draw()
@@ -16,25 +17,23 @@ end
 
 function OverworldState:drawPlayer()
     local player = self.engine.models.player
-    local camera = self.engine.models.camera
     love.graphics.setColor(255, 255, 255, 255)
     love.graphics.rectangle(
         'fill',
-        player.x - camera.scroll.x,
-        player.y - camera.scroll.y,
-        32, 32
+        player.x,
+        player.y,
+        48, 48
     )
 end
 
 function OverworldState:drawBullets()
     local bulletManager = self.engine.models.bulletManager
-    local camera = self.engine.models.camera
     love.graphics.setColor(255, 0, 0, 255)
     for i, bullet in ipairs(bulletManager.bullets) do
         love.graphics.rectangle(
             'fill',
-            bullet.x - camera.scroll.x,
-            bullet.y - camera.scroll.y,
+            bullet.x,
+            bullet.y,
             8, 8
         )
     end
@@ -42,22 +41,22 @@ end
 
 function OverworldState:drawTileMap()
     local player = self.engine.models.player
-    local camera = self.engine.models.camera
     local tilesheet = self.engine.images.tilesheet
     local map = self.engine.models.map
 
     love.graphics.setColor(255, 255, 255, 255)
-    local bounds = camera:getOnScreenTileBounds()
-    for row = bounds.rowMin, bounds.rowMax do
-        for col = bounds.colMin, bounds.colMax do
-            local tile = map:tileAt(col, row)
-            if tile ~= nil then
-                love.graphics.draw(
-                    tilesheet,
-                    map.quads[tile],
-                    math.floor(col * G.TILE_SIZE - camera.scroll.x),
-                    math.floor(row * G.TILE_SIZE - camera.scroll.y)
-                )
+    for layer = 1, #map.layers do
+        for row = 1, G.ROOM_HEIGHT do
+            for col = 1, G.ROOM_WIDTH do
+                local tile = map:tileAt(col, row, layer)
+                if tile ~= nil then
+                    love.graphics.draw(
+                        tilesheet,
+                        map.quads[tile],
+                        math.floor((col-1) * G.TILE_SIZE),
+                        math.floor((row-1) * G.TILE_SIZE)
+                    )
+                end
             end
         end
     end
