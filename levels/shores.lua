@@ -7,7 +7,7 @@ return {
   height = 9,
   tilewidth = 32,
   tileheight = 32,
-  nextobjectid = 1,
+  nextobjectid = 4,
   properties = {},
   tilesets = {
     {
@@ -52,6 +52,31 @@ return {
         178, 178, 178, 178, 178, 113, 130, 98, 129, 115, 178, 178, 178, 178, 178,
         178, 178, 178, 178, 178, 178, 97, 98, 99, 178, 178, 178, 178, 178, 178,
         178, 178, 178, 178, 178, 178, 97, 98, 99, 178, 178, 178, 178, 178, 178
+      }
+    },
+    {
+      type = "objectgroup",
+      name = "npcs",
+      visible = true,
+      opacity = 1,
+      properties = {},
+      objects = {
+        {
+          id = 3,
+          name = "Pile of Wood",
+          type = "",
+          shape = "rectangle",
+          x = 256,
+          y = 160,
+          width = 0,
+          height = 0,
+          rotation = 0,
+          gid = 165,
+          visible = true,
+          properties = {
+            ["Dialog"] = "Hello friend, I am wood."
+          }
+        }
       }
     }
   }

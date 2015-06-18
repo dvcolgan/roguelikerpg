@@ -50,4 +50,8 @@ function BulletManager:onUpdate(dt)
     )
 end
 
+function BulletManager:onRoomChange(dx, dy)
+    self.bullets = {}
+end
+
 return BulletManager

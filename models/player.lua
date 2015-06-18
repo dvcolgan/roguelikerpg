@@ -22,9 +22,9 @@ function Player:onUpdate(dt)
     states = self.engine.models.key.states
 
     local moveLeft = states.a
-    local moveRight = states.e
-    local moveUp = states.comma
-    local moveDown = states.o
+    local moveRight = states.e or states.d
+    local moveUp = states.comma or states.w
+    local moveDown = states.o or states.s
 
     -- Do acceleration
     if moveLeft then
