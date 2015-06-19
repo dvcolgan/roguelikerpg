@@ -12,7 +12,36 @@ end
 function OverworldState:draw()
     self:drawTileMap()
     self:drawPlayer()
+    self:drawNPCs()
     self:drawBullets()
+    self:drawDialog()
+end
+
+function OverworldState:drawNPCs()
+    for key, npc in pairs(self.engine.models.npc.npcs) do
+        love.graphics.setColor(0, 0, 255, 255)
+        love.graphics.rectangle(
+            'fill',
+            npc.x,
+            npc.y,
+            48, 48
+        )
+    end
+end
+
+function OverworldState:drawDialog()
+    local boxWidth = 150*3
+    local boxHeight = 60*3
+    local dialog = self.engine.models.dialog
+    if dialog.show then
+        love.graphics.setColor(0, 0, 255, 255)
+        love.graphics.rectangle('fill',
+            love.graphics.getWidth() - boxWidth - 20,
+            20,
+            boxWidth,
+            boxHeight
+        )
+    end
 end
 
 function OverworldState:drawPlayer()

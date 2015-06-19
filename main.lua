@@ -9,6 +9,8 @@ function love.load()
         key=require('models/key'),
         bulletManager=require('models/bullet-manager'),
         map=require('models/map'),
+        npc=require('models/npc'),
+        dialog=require('models/dialog'),
     })
     engine:addStates({
         --title=require('states/title'),

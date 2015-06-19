@@ -8,10 +8,12 @@ local Map = class('Map')
 function Map:initialize(engine)
     self.rooms = {}
     roomFileNames = love.filesystem.getDirectoryItems('levels/test')
-    for i, room in ipairs(roomFileNames) do
-        _, _, roomName = string.find(room, '_(.-).lua')
-        requirePath = 'levels/test/' .. string.gsub(room, '.lua', '')
-        self.rooms[roomName] = require(requirePath)
+    for i, roomFileName in ipairs(roomFileNames) do
+        if not string.find(roomFileName, '%.swp$') then
+            _, _, roomName = string.find(roomFileName, '_(.-).lua')
+            requirePath = 'levels/test/' .. string.gsub(roomFileName, '.lua', '')
+            self.rooms[roomName] = require(requirePath)
+        end
     end
     self.roomX = 0
     self.roomY = 0
@@ -49,9 +51,14 @@ function Map:onRoomChange(dx, dy)
     self.roomY = self.roomY + dy
     local key = tostring(self.roomX) .. 'x' .. tostring(self.roomY)
     if self.rooms[key] then
-        local mapData = self.rooms[key]
-        self.layers = mapData.layers
+        self.engine:trigger('roomNeeded', key)
     end
+end
+
+function Map:onRoomNeeded(key)
+    local roomData = self.rooms[key]
+    self.layers = roomData.layers
+    roomData.script(self.engine)
 end
 
 function Map:tileAt(col, row, layer)

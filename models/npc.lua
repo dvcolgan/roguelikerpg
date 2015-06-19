@@ -8,19 +8,22 @@ function NPC:initialize(engine)
     self.npcs = {}
 end
 
-function NPC:onAddNPC(name, npcData)
-    self.npcs[name] = {
+function NPC:onAddNPC(npcData)
+    self.npcs[npcData.key] = {
+        key = npcData.key,
+        name = npcData.name,
         x = npcData.x,
         y = npcData.y,
         dialog = npcData.dialog,
     }
 end
 
-function NPC:onRemoveNPC(name)
-    self.npcs[name] = nil
+function NPC:onRemoveNPC(key)
+    self.npcs[key] = nil
 end
 
-function NPC:onSayNPC(name, words)
+function NPC:onRoomChange()
+    self.npcs = {}
 end
 
 return NPC

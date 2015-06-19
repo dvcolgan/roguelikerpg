@@ -1,29 +1,16 @@
-add shooting
-add enemies
 add npcs
 add dialog
+add shooting
+add enemies
 add collision with the map
 add inventory
 add animations
 fix the bug on the market map screen (off by one with quads?)
-
-
-You go to the shores screen
-    if it is the first time,
-        see a cut scene
-            prevent player from moving
-            place girl in location
-            place guy in location
-            guy says 'I don\'t want you anymore.'
-            girl says cry
-            walk guy towards you
-            guy says words 'what do you want? go away'
-            guy walks off screen
-            delete guy from room
-            give back control
-            girl dialog 'I am become sad.'
-    else
-        npc girl sits there cry, says 'Please go get my boyfriend back.'
-        if you give boyfriend back
-            npc girl says yay and kiss
-        
+add tanks with cowboy hat on top
+add hats
+add slippery tiles
+add roller skates
+add unicycles
+add zafad
+add ability to kill npcs if they get annoying
+add ear protectors that reduce the volume of all sounds
