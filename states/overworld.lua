@@ -39,7 +39,7 @@ end
 
 function OverworldState:create()
     love.graphics.setNewFont(18)
-    self.engine:trigger('roomChange', 0, 0)
+    self.engine:trigger('roomChange', 0, -1)
 end
 
 function OverworldState:draw()

@@ -1,11 +1,14 @@
-add npcs
-add dialog
-add shooting
+-- Import for gameplay
+work more on the cutscene system
 add enemies
-add collision with the map
+add physics to player and enemies
+add physics to walls
+add physics to objects in the map
 add inventory
 add animations
 fix the bug on the market map screen (off by one with quads?)
+
+-- Someday features
 add tanks with cowboy hat on top
 add hats
 add slippery tiles
