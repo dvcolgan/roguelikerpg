@@ -1,6 +1,5 @@
 local class = require('middleclass')
 local G = require('constants')
-local MarchingSquares = require('lib/marchingsquares')
 
 
 local Map = class('Map')
@@ -10,7 +9,6 @@ function Map:initialize(engine)
     self.engine = engine
 
     self.rooms = {}
-    self.vertexGroups = {}
     roomFileNames = love.filesystem.getDirectoryItems('levels/test')
     for i, roomFileName in ipairs(roomFileNames) do
         if not string.find(roomFileName, '%.swp$') then
@@ -62,8 +60,9 @@ end
 function Map:onRoomNeeded(key)
     local roomData = self.rooms[key]
     self.layers = roomData.layers
+    self.collision = roomData.collision
     roomData.script(self.engine)
-    self.vertexGroups = MarchingSquares:new(roomData.collision):findMapBoxVertexGroups()
+    self.engine:trigger('roomLoaded')
 end
 
 function Map:tileAt(col, row, layer)

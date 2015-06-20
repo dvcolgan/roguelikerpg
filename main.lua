@@ -10,6 +10,7 @@ function love.load()
         map=require('models/map'),
         npc=require('models/npc'),
         dialog=require('models/dialog'),
+        physics=require('models/physics'),
     })
     engine:addStates({
         --title=require('states/title'),

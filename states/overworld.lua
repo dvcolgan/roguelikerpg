@@ -100,14 +100,17 @@ function OverworldState:drawDialog()
 end
 
 function OverworldState:drawPlayer()
-    local player = self.engine.models.player
-    love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.rectangle(
-        'fill',
-        player.x,
-        player.y,
-        48, 48
-    )
+    local player = self.engine.models.physics.objects.player
+    if player then
+        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.circle(
+            'fill',
+            player.body:getX(),
+            player.body:getY(),
+            player.shape:getRadius(),
+            16
+        )
+    end
 end
 
 function OverworldState:drawBullets()
@@ -139,7 +142,7 @@ function OverworldState:drawTileMap()
                         map.quads[tile],
                         math.floor((col-1) * G.TILE_SIZE),
                         math.floor((row-1) * G.TILE_SIZE)
-                    )
+                    ) 
                 end
             end
         end
@@ -147,9 +150,9 @@ function OverworldState:drawTileMap()
 end
 
 function OverworldState:drawVertexGroups()
-    local map = self.engine.models.map
+    local vertexGroups = self.engine.models.physics.vertexGroups
 
-    for i, vertexGroup in ipairs(map.vertexGroups) do
+    for i, vertexGroup in ipairs(vertexGroups) do
         love.graphics.setColor(255, 0, 0, 255)
         love.graphics.rectangle(
             'fill',
