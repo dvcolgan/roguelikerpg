@@ -16,8 +16,13 @@ end
 
 
 function Physics:clearObjects()
-    for i, object in ipairs(self.objects) do
-        object:destroy()
+    if self.objects.map then
+        for i, object in ipairs(self.objects.map) do
+            object.body:destroy()
+        end
+    end
+    if self.objects.player then
+        self.objects.player.body:destroy()
     end
     self.objects = {}
 end
@@ -60,6 +65,7 @@ function Physics:onUpdate(dt)
     end
 
     local playerPhysics = self.objects.player
+    if playerPhysics == nil then return end
     states = self.engine.models.key.states
 
     local moveLeft = states.a
@@ -79,6 +85,24 @@ function Physics:onUpdate(dt)
     end
     if moveDown then
         playerPhysics.body:applyForce(0, player.acceleration)
+    end
+
+    -- Check if offscreen
+    if playerPhysics.body:getX() > G.ROOM_WIDTH * G.TILE_SIZE then
+        self.engine:trigger('roomChange', 1, 0)
+        playerPhysics.body:setX(0)
+    end
+    if playerPhysics.body:getX() < 0 then
+        self.engine:trigger('roomChange', -1, 0)
+        playerPhysics.body:setX(G.ROOM_WIDTH * G.TILE_SIZE - 1)
+    end
+    if playerPhysics.body:getY() > G.ROOM_HEIGHT * G.TILE_SIZE then
+        self.engine:trigger('roomChange', 0, 1)
+        playerPhysics.body:setY(0)
+    end
+    if playerPhysics.body:getY() < 0 then
+        self.engine:trigger('roomChange', 0, -1)
+        playerPhysics.body:setY(G.ROOM_HEIGHT * G.TILE_SIZE - 1)
     end
 end
 

@@ -1,9 +1,8 @@
 -- Import for gameplay
 work more on the cutscene system
 add enemies
-add physics to player and enemies
-add physics to walls
-add physics to objects in the map
+add physics to enemies
+make physics still work on room change
 add inventory
 add animations
 fix the bug on the market map screen (off by one with quads?)
