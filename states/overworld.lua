@@ -39,7 +39,7 @@ end
 
 function OverworldState:create()
     love.graphics.setNewFont(18)
-    self.engine:trigger('roomChange', 0, -1)
+    self.engine:trigger('roomChange', 0, 0)
 end
 
 function OverworldState:draw()
@@ -48,6 +48,7 @@ function OverworldState:draw()
     self:drawNPCs()
     self:drawBullets()
     self:drawDialog()
+    self:drawVertexGroups()
 end
 
 function OverworldState:drawNPCs()
@@ -142,6 +143,22 @@ function OverworldState:drawTileMap()
                 end
             end
         end
+    end
+end
+
+function OverworldState:drawVertexGroups()
+    local map = self.engine.models.map
+
+    for i, vertexGroup in ipairs(map.vertexGroups) do
+        love.graphics.setColor(255, 0, 0, 255)
+        love.graphics.rectangle(
+            'fill',
+            vertexGroup.topLeft.x,
+            vertexGroup.topLeft.y,
+            vertexGroup.topRight.x - vertexGroup.topLeft.x,
+            vertexGroup.bottomLeft.y - vertexGroup.topLeft.y,
+            48, 48
+        )
     end
 end
 

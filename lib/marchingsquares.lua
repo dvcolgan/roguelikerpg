@@ -78,20 +78,20 @@ function MarchingSquares:findMapBoxVertexGroups()
     for i, box in ipairs(self.boxes) do
         local vertexGroup = {}
         vertexGroup.topLeft = {
-            x = box.topLeft.col * G.TILE_SIZE,
-            y = box.topLeft.row * G.TILE_SIZE,
+            x = (box.topLeft.col-1) * G.TILE_SIZE,
+            y = (box.topLeft.row-1) * G.TILE_SIZE,
         }
         vertexGroup.topRight = {
-            x = box.topRight.col * G.TILE_SIZE + G.TILE_SIZE,
-            y = box.topRight.row * G.TILE_SIZE,
+            x = (box.topRight.col-1) * G.TILE_SIZE + G.TILE_SIZE,
+            y = (box.topRight.row-1) * G.TILE_SIZE,
         }
         vertexGroup.bottomLeft = {
-            x = box.bottomLeft.col * G.TILE_SIZE,
-            y = box.bottomLeft.row * G.TILE_SIZE + G.TILE_SIZE,
+            x = (box.bottomLeft.col-1) * G.TILE_SIZE,
+            y = (box.bottomLeft.row-1) * G.TILE_SIZE + G.TILE_SIZE,
         }
         vertexGroup.bottomRight = {
-            x = box.bottomRight.col * G.TILE_SIZE + G.TILE_SIZE,
-            y = box.bottomRight.row * G.TILE_SIZE + G.TILE_SIZE,
+            x = (box.bottomRight.col-1) * G.TILE_SIZE + G.TILE_SIZE,
+            y = (box.bottomRight.row-1) * G.TILE_SIZE + G.TILE_SIZE,
         }
         table.insert(self.vertexGroups, vertexGroup)
     end

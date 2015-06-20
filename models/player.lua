@@ -6,8 +6,8 @@ local Player = class('Player')
 
 function Player:initialize(engine)
     self.engine = engine
-    self.x = 0
-    self.y = 0
+    self.x = love.graphics.getWidth() / 2
+    self.y = love.graphics.getHeight() / 2
     self.dx = 0
     self.dy = 0
     self.direction = 'left'

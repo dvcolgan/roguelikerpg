@@ -10,6 +10,7 @@ function Map:initialize(engine)
     self.engine = engine
 
     self.rooms = {}
+    self.vertexGroups = {}
     roomFileNames = love.filesystem.getDirectoryItems('levels/test')
     for i, roomFileName in ipairs(roomFileNames) do
         if not string.find(roomFileName, '%.swp$') then
@@ -62,10 +63,7 @@ function Map:onRoomNeeded(key)
     local roomData = self.rooms[key]
     self.layers = roomData.layers
     roomData.script(self.engine)
-    local boxes = MarchingSquares:new(roomData.collision):findMapBoxes()
-    --for i, box in ipairs(boxes) do
-    --    print(i, box)
-    --end
+    self.vertexGroups = MarchingSquares:new(roomData.collision):findMapBoxVertexGroups()
 end
 
 function Map:tileAt(col, row, layer)
