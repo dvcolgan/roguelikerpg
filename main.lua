@@ -1,6 +1,5 @@
 local Engine = require('lib/eventengine')
 
-
 function love.load()
     engine = Engine:new()
     engine:addImage('tilesheet', love.graphics.newImage('assets/tilesheet.png'))
