@@ -1,8 +1,5 @@
 local G = require('constants')
 
-function sleep(n)
-  os.execute("sleep " .. tonumber(n))
-end
 
 return {
     layers = {
@@ -47,10 +44,10 @@ return {
         engine:triggerAfter(1, 'sayNPC', 'guy', 'I don\'t want you anymore.')
         engine:triggerAfter(2, 'sayNPC', 'girl', '*cry*')
         engine:triggerAfter(3, 'clearDialog')
-        engine:triggerAfter(3, 'walkNPC', 'guy', { speed = 100, x = 7 * G.TILE_SIZE, y = 7 * G.TILE_SIZE })
+        engine:triggerAfter(3, 'walkNPC', 'guy', { duration = 1, x = 7 * G.TILE_SIZE, y = 7 * G.TILE_SIZE })
         engine:triggerAfter(4, 'sayNPC', 'guy', 'What do you want? Go away')
         engine:triggerAfter(5, 'clearDialog')
-        engine:triggerAfter(5, 'walkNPC', 'guy', { speed=100, x = 7 * G.TILE_SIZE, y = 10 * G.TILE_SIZE })
+        engine:triggerAfter(5, 'walkNPC', 'guy', { duration = 1, x = 7 * G.TILE_SIZE, y = 10 * G.TILE_SIZE })
         engine:triggerAfter(6, 'removeNPC', 'guy')
         engine:triggerAfter(6, 'sayNPC', 'girl', 'I am become sad.')
         engine:triggerAfter(7, 'clearDialog')

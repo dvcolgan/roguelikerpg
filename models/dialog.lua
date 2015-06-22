@@ -1,6 +1,5 @@
 local class = require('middleclass')
 local G = require('constants')
-local testMap = require('levels/test')
 
 
 local Dialog = class('Dialog')
@@ -21,6 +20,10 @@ function Dialog:onSayNPC(key, words)
         self.text = words
     end
     self.show = true
+end
+
+function Dialog:onClearDialog()
+    self:reset()
 end
 
 function Dialog:reset()
