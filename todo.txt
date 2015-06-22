@@ -1,11 +1,110 @@
+List of things David doesn't like in games
+turn based combat
+long lasting not undoable decisions
+branching paths
+skip parts of the game without knowing what I'm skipping
+getting lost
+
+
+I don't like feeling like I've missed something in a game
+If not fully linear, perhaps the story could be done in such a way that you can't miss things
+
+Maybe story parts of the game are chokepoints
+Maybe places where you get items are also chokepoints
+The exploration part can branch as much as we want, but you only get disposable items in those sections?
+
+Multple story sections that can be completed in parallel, but are themselves linear
+
+
+
+How does the game work?
+Sections of the map are always the same, and there are map files for them as well as the objects in those parts (cities, outposts, etc)
+
+The areas between these story areas are randomly generated, with the idea that a single story could be played through multiple times with a different experience each time?
+
+You might go slowly through it the first time to get the full story and you might go speedy quick through the next time to speedrun
+
+Maybe have a way for players/modders to make their own scenaries
+
+Combat:
+You are a guy and you move with wasd and you shoot with arrow keys
+you can also use items that have either a cooldown time or we could just blatantly rip off boi and have a rooms cleared charge time
+
+Everything your character can do is provided by an item
+When you start out, you can't do anything except for move slowly
+
+Nothing happens to your character apart from the items you get
+No experience points
+Maybe there is money
+No number based stats, more skill based to advance
+
+In order to get the full story, you have to play the game through more than once, but playing through the whole game once doesn't take very long.  Instead of playing it through once or maybe twice, the game is designed to support playing through lots and lots of times, with each time lasting an hour at most.
+
+The story is delivered in small bite sized vignettes.
+The story doesn't have a climax, it is just experiencing a world?
+
+Every cutscene could be randomly placed on the map
+Every room is designed, but the locations are random each time, and you come across short ~10 second cut scenes
+
+Have to figure out why the game ends.
+
+There are a bunch of cutscenes that have different attributes, and how you play through the game determines which cutscenes are played, using weighted randomness
+
+You would get items for:
+    running
+    rolling
+    jumping
+    flying
+    shooting
+    throwing
+    picking up pots
+    swording
+    talk to chickens
+    etc
+    dancing
+
+On map load, all blank squares are procedurally generated, and maybe even change every time you enter them
++---------------------------------------------+
+|                                             |
+| ccccc                            cccc       |
+| ccccc                            cccc       |
+| ccccc                            cccc       |
+|              cc                             |
+|                                             |
+|                                             |
+|                    cccc                     |
+|                    ccccc                    |
+|                    cccccc                   |
+|                     ccccc                   |
+|                      cccc                   |
+|        cc                                   |
+|                                             |
+|                                             |
+|              cc                  cc   cccccc|
+|                                       cccccc|
+|                                       cccccc|
++---------------------------------------------+
+
+Map screen similar to zelda for gb as well
+use a maze algorithm?
+quadrant tree map generation methodology
+
+
+I'd like a game that encourages experimentation with the games' mechanics, so choices are never long lasting, or at least are always undoable
+
+Maybe all of your stats are determined by the items you pick up, and you can at any time add or remove items from your inventory
+
+
+
+
 -- Import for gameplay
-work more on the cutscene system
+zelda gb inventory system
+ability to talk to npcs
 add enemies
 add physics to enemies
-make physics still work on room change
 add inventory
 add animations
-fix the bug on the market map screen (off by one with quads?)
+profile to figure out what causes the slow start
 
 -- Someday features
 add tanks with cowboy hat on top
@@ -16,3 +115,12 @@ add unicycles
 add zafad
 add ability to kill npcs if they get annoying
 add ear protectors that reduce the volume of all sounds
+
+
+-- Gameplay example scenario:
+you go to the shores and you see the cutscene
+this puts the guy in the town square
+you go talk to the guy and you get him somehow
+you take him back to the girl and talk to her and they are happily ever after'd
+then roll the credits
+11/10 GOTY

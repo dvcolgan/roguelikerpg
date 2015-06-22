@@ -3,7 +3,8 @@ local class = require('middleclass')
 
 local Flag = class('Flag')
 
-function Flag:initialize()
+function Flag:initialize(engine)
+    self.engine = engine
     self.flags = {}
 end
 
@@ -16,5 +17,7 @@ function Flag:serialize()
 end
 
 function Flag:deserialize(flags)
-    return self.flags = flags
+    self.flags = flags
 end
+
+return Flag

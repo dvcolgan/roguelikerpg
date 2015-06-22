@@ -11,6 +11,7 @@ function love.load()
         npc=require('models/npc'),
         dialog=require('models/dialog'),
         physics=require('models/physics'),
+        flag=require('models/flag'),
     })
     engine:addStates({
         --title=require('states/title'),

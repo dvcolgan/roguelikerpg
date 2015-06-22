@@ -49,6 +49,7 @@ function OverworldState:draw()
     self:drawBullets()
     self:drawDialog()
     --self:drawVertexGroups()
+    --self:drawInventory()
 end
 
 function OverworldState:drawNPCs()
@@ -165,6 +166,33 @@ function OverworldState:drawVertexGroups()
             48, 48
         )
     end
+end
+
+function OverworldState:drawInventory()
+    local boxWidth = love.graphics.getWidth() - 40
+    local boxHeight = love.graphics.getHeight() + 20
+
+    local boxX = 20
+    local boxY = 20
+
+    love.graphics.setColor(0, 0, 0, 255)
+    love.graphics.roundrect(
+        'fill', boxX, boxY,
+        boxWidth, boxHeight,
+        15, 15
+    )
+    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.roundrect(
+        'fill', boxX + 4, boxY + 4,
+        boxWidth - 8, boxHeight - 8,
+        10, 10
+    )
+    love.graphics.setColor(0, 0, 0, 255)
+    love.graphics.roundrect(
+        'fill', boxX + 8, boxY + 8,
+        boxWidth - 16, boxHeight - 16,
+        10, 10
+    )
 end
 
 return OverworldState

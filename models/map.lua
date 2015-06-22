@@ -9,11 +9,12 @@ function Map:initialize(engine)
     self.engine = engine
 
     self.rooms = {}
-    roomFileNames = love.filesystem.getDirectoryItems('levels/test')
+    -- TODO this code is duplicated in item
+    roomFileNames = love.filesystem.getDirectoryItems('scenarios/twolovers/rooms')
     for i, roomFileName in ipairs(roomFileNames) do
         if not string.find(roomFileName, '%.swp$') then
             _, _, roomName = string.find(roomFileName, '_(.-).lua')
-            requirePath = 'levels/test/' .. string.gsub(roomFileName, '.lua', '')
+            requirePath = 'scenarios/twolovers/rooms/' .. string.gsub(roomFileName, '.lua', '')
             self.rooms[roomName] = require(requirePath)
         end
     end
