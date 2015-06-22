@@ -19,6 +19,8 @@ function Map:initialize(engine)
     end
     self.roomX = 0
     self.roomY = 0
+    self.lastRoomX = 0
+    self.lastRoomY = 0
 
     self.layers = {}
 
@@ -48,9 +50,12 @@ function Map:initialize(engine)
 end
 
 function Map:onRoomChange(dx, dy)
+    self.lastRoomX = self.roomX
+    self.lastRoomY = self.roomY
     self.roomX = self.roomX + dx
     self.roomY = self.roomY + dy
     local key = tostring(self.roomX) .. 'x' .. tostring(self.roomY)
+    print('changing to', key)
     if self.rooms[key] then
         self.engine:trigger('roomNeeded', key)
     end

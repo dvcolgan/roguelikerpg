@@ -28,9 +28,8 @@ function Physics:clearObjects()
 end
 
 function Physics:onRoomLoaded()
-    local collision = self.engine.models.map.collision
-    self:clearObjects()
-    self.vertexGroups = MarchingSquares:new(collision):findMapBoxVertexGroups()
+    local map = self.engine.models.map
+    self.vertexGroups = MarchingSquares:new(map.collision):findMapBoxVertexGroups()
 
     self.objects.map = {}
     for i, vertexGroup in ipairs(self.vertexGroups) do
@@ -50,6 +49,29 @@ function Physics:onRoomLoaded()
     local player = self.engine.models.player
     playerPhysics.body = love.physics.newBody(self.world, player.x, player.y, 'dynamic')
     playerPhysics.body:setLinearDamping(10)
+
+    if map.roomY < map.lastRoomY then
+        -- went up
+        playerPhysics.body:setX(player.lastX)
+        playerPhysics.body:setY(G.ROOM_HEIGHT * G.TILE_SIZE - 1)
+    elseif map.roomY > map.lastRoomY then
+        -- went down
+        playerPhysics.body:setX(player.lastX)
+        playerPhysics.body:setY(0)
+    elseif map.roomX < map.lastRoomX then
+        -- went left
+        playerPhysics.body:setX(G.ROOM_WIDTH * G.TILE_SIZE - 1)
+        playerPhysics.body:setY(player.lastY)
+    elseif map.roomX > map.lastRoomX then
+        -- went right
+        playerPhysics.body:setX(0)
+        playerPhysics.body:setY(player.lastY)
+    else
+        -- just started the game, place in center of room
+        playerPhysics.body:setX(G.ROOM_WIDTH * G.TILE_SIZE / 2)
+        playerPhysics.body:setY(G.ROOM_HEIGHT * G.TILE_SIZE / 2)
+    end
+
     playerPhysics.shape = love.physics.newCircleShape(24)
     playerPhysics.fixture = love.physics.newFixture(playerPhysics.body, playerPhysics.shape, 1)
     playerPhysics.fixture:setRestitution(0.2)
@@ -88,21 +110,18 @@ function Physics:onUpdate(dt)
     end
 
     -- Check if offscreen
-    if playerPhysics.body:getX() > G.ROOM_WIDTH * G.TILE_SIZE then
+    if playerPhysics.body:getX() >= G.ROOM_WIDTH * G.TILE_SIZE then
         self.engine:trigger('roomChange', 1, 0)
-        playerPhysics.body:setX(0)
-    end
-    if playerPhysics.body:getX() < 0 then
+        self:clearObjects()
+    elseif playerPhysics.body:getX() < 0 then
         self.engine:trigger('roomChange', -1, 0)
-        playerPhysics.body:setX(G.ROOM_WIDTH * G.TILE_SIZE - 1)
-    end
-    if playerPhysics.body:getY() > G.ROOM_HEIGHT * G.TILE_SIZE then
+        self:clearObjects()
+    elseif playerPhysics.body:getY() >= G.ROOM_HEIGHT * G.TILE_SIZE then
         self.engine:trigger('roomChange', 0, 1)
-        playerPhysics.body:setY(0)
-    end
-    if playerPhysics.body:getY() < 0 then
+        self:clearObjects()
+    elseif playerPhysics.body:getY() < 0 then
         self.engine:trigger('roomChange', 0, -1)
-        playerPhysics.body:setY(G.ROOM_HEIGHT * G.TILE_SIZE - 1)
+        self:clearObjects()
     end
 end
 

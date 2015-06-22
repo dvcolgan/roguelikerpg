@@ -137,12 +137,14 @@ function OverworldState:drawTileMap()
             for col = 1, G.ROOM_WIDTH do
                 local tile = map:tileAt(col, row, layer)
                 if tile ~= nil then
-                    love.graphics.draw(
-                        tilesheet,
-                        map.quads[tile],
-                        math.floor((col-1) * G.TILE_SIZE),
-                        math.floor((row-1) * G.TILE_SIZE)
-                    ) 
+                    if tile > 0 then
+                        love.graphics.draw(
+                            tilesheet,
+                            map.quads[tile],
+                            math.floor((col-1) * G.TILE_SIZE),
+                            math.floor((row-1) * G.TILE_SIZE)
+                        ) 
+                    end
                 end
             end
         end
