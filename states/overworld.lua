@@ -48,7 +48,7 @@ function OverworldState:draw()
     self:drawNPCs()
     self:drawBullets()
     self:drawDialog()
-    self:drawVertexGroups()
+    --self:drawVertexGroups()
 end
 
 function OverworldState:drawNPCs()
