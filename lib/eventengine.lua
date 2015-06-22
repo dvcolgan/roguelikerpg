@@ -6,6 +6,7 @@ local Engine = class('Engine')
 function Engine:initialize()
     self.callbacks = {}
     self.queue = {}
+    self.delayedQueue = {}
     self.states = {}
     self.models = {}
     self.images = {}
@@ -39,7 +40,14 @@ function Engine:setState(stateName, changes)
     end
 end
 
-function Engine:pump()
+function Engine:pump(dt)
+    for key, delayedEvent in pairs(self.delayedQueue) do
+        delayedEvent.remaining = delayedEvent.remaining - dt
+        if delayedEvent.remaining <= 0 then
+            table.insert(self.queue, delayedEvent.event)
+            self.delayedQueue[key] = nil
+        end
+    end
     local queue = self.queue
     self.queue = {}
 
@@ -73,10 +81,20 @@ function Engine:trigger(eventName,
         arg1, arg2, arg3, arg4, arg5
     })
 end
+function Engine:triggerAfter(delay, eventName,
+        arg1, arg2, arg3, arg4, arg5)
+    table.insert(self.delayedQueue, {
+        remaining = delay,
+        event = {
+            eventName,
+            arg1, arg2, arg3, arg4, arg5
+        }
+    })
+end
 
 function Engine:update(dt)
     self:trigger('update', dt)
-    self:pump()
+    self:pump(dt)
 
     for name, state in pairs(self.states) do
         if state.doUpdate then

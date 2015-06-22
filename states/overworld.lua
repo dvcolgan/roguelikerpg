@@ -92,7 +92,7 @@ function OverworldState:drawDialog()
         )
         love.graphics.setColor(255, 255, 255, 255)
         love.graphics.printf(
-            dialog.text,
+            dialog.speaker .. ': ' .. dialog.text,
             boxX + 20, boxY + 20,
             boxWidth - 40
         )
