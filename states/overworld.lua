@@ -40,9 +40,21 @@ end
 function OverworldState:create()
     love.graphics.setNewFont(18)
     self.engine:trigger('roomChange', 0, 0)
+    local background = self.engine.images.background
+    self.backgroundQuad = love.graphics.newQuad(
+        0, 0,
+        love.graphics.getWidth(),
+        love.graphics.getHeight(),
+        background:getWidth(), background:getHeight()
+    )
 end
 
 function OverworldState:draw()
+    love.graphics.draw(
+        self.engine.images.background,
+        self.backgroundQuad,
+        0, 0
+    )
     self:drawTileMap()
     self:drawPlayer()
     self:drawNPCs()
