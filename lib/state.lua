@@ -12,7 +12,7 @@ end
 function GameState:create()
 end
 
-function GameState:update(dt)
+function GameState:update(dtInSec)
 end
 
 function GameState:draw()

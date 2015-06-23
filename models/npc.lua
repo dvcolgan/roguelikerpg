@@ -35,10 +35,10 @@ function NPC:onRoomChange()
     self.npcs = {}
 end
 
-function NPC:onUpdate(dt)
+function NPC:onUpdate(dtInSec)
     for key, npc in pairs(self.npcs) do
         if npc.tween then
-            npc.tween.elapsedTime = npc.tween.elapsedTime + dt
+            npc.tween.elapsedTime = npc.tween.elapsedTime + dtInSec
             npc.x = npc.tween.startX + (npc.tween.x - npc.tween.startX) * (npc.tween.elapsedTime / npc.tween.duration)
             npc.y = npc.tween.startY + (npc.tween.y - npc.tween.startY) * (npc.tween.elapsedTime / npc.tween.duration)
             if npc.tween.elapsedTime >= npc.tween.duration then

@@ -12,9 +12,9 @@ function TitleState:create()
     self.dy=1
 end
 
-function TitleState:update(dt)
-    self.x = self.x + self.speed * dt * self.dx
-    self.y = self.y + self.speed * dt * self.dy
+function TitleState:update(dtInSec)
+    self.x = self.x + self.speed * dtInSec * self.dx
+    self.y = self.y + self.speed * dtInSec * self.dy
     local width = love.window.getWidth()
     local height = love.window.getHeight()
 

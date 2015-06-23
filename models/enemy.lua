@@ -37,19 +37,20 @@ function Enemy:onMapLoaded()
 end
 
 
-function Enemy:onUpdate(dt)
+function Enemy:onUpdate(dtInSec)
     local enemiesPhysics = self.engine.models.physics.objects.enemies
     if enemiesPhysics then
         for uuid, enemy in pairs(self.enemies) do
             local enemyPhysics = enemiesPhysics[uuid]
-            enemy.shotTime = enemy.shotTime + dt
+            enemy.shotTime = enemy.shotTime + dtInSec
             if enemy.shotTime >= enemy.fireRate then
                 self.engine:trigger('fire', {
                     damage = enemy.damage,
                     x = enemyPhysics.body:getX(),
                     y = enemyPhysics.body:getY(),
-                    group = 'enemy'
+                    category = G.COLLISION.ENEMY_BULLET,
                 })
+                enemy.shotTime = 0
             end
         end
     end

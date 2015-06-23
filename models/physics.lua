@@ -65,6 +65,8 @@ function Physics:onEnemiesLoaded()
         enemyPhysics.body:setY(enemy.y)
         enemyPhysics.shape = love.physics.newCircleShape(enemy.radius)
         enemyPhysics.fixture = love.physics.newFixture(enemyPhysics.body, enemyPhysics.shape, 1)
+        enemyPhysics.fixture:setCategory(G.COLLISION.ENEMY)
+        enemyPhysics.fixture:setMask(G.COLLISION.ENEMY, G.COLLISION.ENEMY_BULLET)
         enemyPhysics.fixture:setRestitution(0.2)
         enemiesPhysics[uuid] = enemyPhysics
     end
@@ -100,6 +102,8 @@ function Physics:onEnemiesLoaded()
     playerPhysics.shape = love.physics.newCircleShape(24)
     playerPhysics.fixture = love.physics.newFixture(playerPhysics.body, playerPhysics.shape, 1)
     playerPhysics.fixture:setRestitution(0.2)
+    playerPhysics.fixture:setCategory(G.COLLISION.PLAYER)
+    playerPhysics.fixture:setMask(G.COLLISION.PLAYER, G.COLLISION.PLAYER_BULLET)
     self.objects.player = playerPhysics
 
     self.objects.bullets = {}
@@ -113,6 +117,10 @@ function Physics:onBulletFired(uuid, bullet)
     bulletPhysics.shape = love.physics.newCircleShape(bullet.damage)
     bulletPhysics.fixture = love.physics.newFixture(bulletPhysics.body, bulletPhysics.shape, 1)
     bulletPhysics.fixture:setRestitution(0.3)
+    bulletPhysics.fixture:setCategory(bullet.category)
+    bulletPhysics.fixture:setMask(bullet.category)
+    local force = 2000
+    bulletPhysics.body:applyForce(math.random(force * 2) - force, math.random(force * 2) - force)
     self.objects.bullets[uuid] = bulletPhysics
 end
 
@@ -121,8 +129,8 @@ function Physics:onBulletTimeout(uuid)
     self.objects.bullets[uuid] = nil
 end
 
-function Physics:onUpdate(dt)
-    self.world:update(dt)
+function Physics:onUpdate(dtInSec)
+    self.world:update(dtInSec)
 
     local player = self.engine.models.player
     if player.frozen then

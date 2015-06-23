@@ -5,6 +5,7 @@ return {
     COLLISION = {
         PLAYER = 1,
         ENEMY = 2,
-        BULLET = 3,
+        PLAYER_BULLET = 3,
+        ENEMY_BULLET = 4,
     }
 }

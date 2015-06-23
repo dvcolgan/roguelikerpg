@@ -83,6 +83,8 @@ Combat:
 You are a guy and you move with wasd and you shoot with arrow keys
 you can also use items that have either a cooldown time or we could just blatantly rip off boi and have a rooms cleared charge time
 
+Maybe use the stacking objects on top of each other bug as a mine?
+
 Everything your character can do is provided by an item
 When you start out, you can't do anything except for move slowly
 

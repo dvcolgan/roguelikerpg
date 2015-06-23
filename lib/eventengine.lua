@@ -40,9 +40,9 @@ function Engine:setState(stateName, changes)
     end
 end
 
-function Engine:pump(dt)
+function Engine:pump(dtInSec)
     for key, delayedEvent in pairs(self.delayedQueue) do
-        delayedEvent.remaining = delayedEvent.remaining - dt
+        delayedEvent.remaining = delayedEvent.remaining - dtInSec
         if delayedEvent.remaining <= 0 then
             table.insert(self.queue, delayedEvent.event)
             self.delayedQueue[key] = nil
@@ -92,13 +92,13 @@ function Engine:triggerAfter(delay, eventName,
     })
 end
 
-function Engine:update(dt)
-    self:trigger('update', dt)
-    self:pump(dt)
+function Engine:update(dtInSec)
+    self:trigger('update', dtInSec)
+    self:pump(dtInSec)
 
     for name, state in pairs(self.states) do
         if state.doUpdate then
-            state:update(dt)
+            state:update(dtInSec)
         end
     end
 end

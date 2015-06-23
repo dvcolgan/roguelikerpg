@@ -27,8 +27,8 @@ function love.draw()
 end
 
 
-function love.update(dt)
-    engine:update(dt)
+function love.update(dtInSec)
+    engine:update(dtInSec)
 end
 
 
