@@ -7,5 +7,6 @@ return {
         ENEMY = 2,
         PLAYER_BULLET = 3,
         ENEMY_BULLET = 4,
+        WALL = 5,
     }
 }

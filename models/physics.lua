@@ -52,6 +52,7 @@ function Physics:onEnemiesLoaded()
         object.body = love.physics.newBody(self.world, centerX, centerY)
         object.shape = love.physics.newRectangleShape(width, height)
         object.fixture = love.physics.newFixture(object.body, object.shape)
+        object.fixture:setCategory(G.COLLISION.WALL)
         table.insert(self.objects.map, object)
     end
 
@@ -118,9 +119,16 @@ function Physics:onBulletFired(uuid, bullet)
     bulletPhysics.fixture = love.physics.newFixture(bulletPhysics.body, bulletPhysics.shape, 1)
     bulletPhysics.fixture:setRestitution(0.3)
     bulletPhysics.fixture:setCategory(bullet.category)
-    bulletPhysics.fixture:setMask(bullet.category)
+    if bullet.category == G.COLLISION.PLAYER_BULLET then
+        bulletPhysics.fixture:setMask(G.COLLISION.ENEMY_BULLET)
+    else
+        bulletPhysics.fixture:setMask(G.COLLISION.PLAYER_BULLET, G.COLLISION.ENEMY_BULLET)
+    end
     local force = 2000
-    bulletPhysics.body:applyForce(math.random(force * 2) - force, math.random(force * 2) - force)
+    bulletPhysics.body:applyForce(
+        bullet.dx * force,
+        bullet.dy * force
+    )
     self.objects.bullets[uuid] = bulletPhysics
 end
 

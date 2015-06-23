@@ -1,6 +1,7 @@
 local class = require('middleclass')
 local util = require('util')
 local G = require('constants')
+local vector = require('vector')
 
 
 local Enemy = class('Enemy')
@@ -44,10 +45,23 @@ function Enemy:onUpdate(dtInSec)
             local enemyPhysics = enemiesPhysics[uuid]
             enemy.shotTime = enemy.shotTime + dtInSec
             if enemy.shotTime >= enemy.fireRate then
+                local playerPhysics = self.engine.models.physics.objects.player
+                local targetX = playerPhysics.body:getX()
+                local targetY = playerPhysics.body:getY()
+                local startX = enemyPhysics.body:getX()
+                local startY = enemyPhysics.body:getY()
+
+                local dx, dy = vector.normalize(
+                    targetX - startX,
+                    targetY - startY
+                )
+
                 self.engine:trigger('fire', {
                     damage = enemy.damage,
-                    x = enemyPhysics.body:getX(),
-                    y = enemyPhysics.body:getY(),
+                    x = startX,
+                    y = startY,
+                    dx = dx,
+                    dy = dy,
                     category = G.COLLISION.ENEMY_BULLET,
                 })
                 enemy.shotTime = 0

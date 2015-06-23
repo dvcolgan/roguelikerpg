@@ -13,7 +13,7 @@ function Player:initialize(engine)
     self.drag = 30
     self.maxSpeed = 3
     self.frozen = false
-    self.damage = 5
+    self.damage = 10
 end
 
 function Player:onTakeAwayControls()
