@@ -7,17 +7,28 @@ local Map = class('Map')
 
 function Map:initialize(engine)
     self.engine = engine
-
+    self.roomTemplates = {}
     self.rooms = {}
+    self.enemies = {}
+    self.items = {}
+
     -- TODO this code is duplicated in item
-    roomFileNames = love.filesystem.getDirectoryItems('scenarios/twolovers/rooms')
+    roomFileNames = love.filesystem.getDirectoryItems('scenarios/prisonship/rooms')
     for i, roomFileName in ipairs(roomFileNames) do
         if not string.find(roomFileName, '%.swp$') then
-            _, _, roomName = string.find(roomFileName, '_(.-).lua')
-            requirePath = 'scenarios/twolovers/rooms/' .. string.gsub(roomFileName, '.lua', '')
-            self.rooms[roomName] = require(requirePath)
+            _, _, roomName = string.find(roomFileName, '(.*).lua')
+            requirePath = 'scenarios/prisonship/rooms/' .. string.gsub(roomFileName, '.lua', '')
+            self.roomTemplates[roomName] = require(requirePath)
         end
     end
+    for name, room in pairs(self.roomTemplates) do
+        print(name, room)
+    end
+
+    self.rooms = {
+        ['0x0'] = self.roomTemplates.deck1
+    }
+
     self.roomX = 0
     self.roomY = 0
     self.lastRoomX = 0
@@ -56,7 +67,6 @@ function Map:onRoomChange(dx, dy)
     self.roomX = self.roomX + dx
     self.roomY = self.roomY + dy
     local key = tostring(self.roomX) .. 'x' .. tostring(self.roomY)
-    print('changing to', key)
     if self.rooms[key] then
         self.engine:trigger('roomNeeded', key)
     end
@@ -67,8 +77,10 @@ function Map:onRoomNeeded(key)
     local roomData = self.rooms[key]
     self.layers = roomData.layers
     self.collision = roomData.collision
+    self.enemies = roomData.enemies
+    self.items = roomData.items
     roomData.script(self.engine)
-    self.engine:trigger('roomLoaded')
+    self.engine:trigger('mapLoaded')
 end
 
 function Map:tileAt(col, row, layer)

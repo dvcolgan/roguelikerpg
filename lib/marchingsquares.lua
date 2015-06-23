@@ -93,6 +93,11 @@ function MarchingSquares:findMapBoxVertexGroups()
             x = (box.bottomRight.col-1) * G.TILE_SIZE + G.TILE_SIZE,
             y = (box.bottomRight.row-1) * G.TILE_SIZE + G.TILE_SIZE,
         }
+        vertexGroup.color = {
+            r = math.random(255),
+            g = math.random(255),
+            b = math.random(255),
+        }
         table.insert(self.vertexGroups, vertexGroup)
     end
     return self.vertexGroups

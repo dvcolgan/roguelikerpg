@@ -46,6 +46,7 @@ function OverworldState:draw()
     self:drawTileMap()
     self:drawPlayer()
     self:drawNPCs()
+    self:drawEnemies()
     self:drawBullets()
     self:drawDialog()
     --self:drawVertexGroups()
@@ -61,6 +62,22 @@ function OverworldState:drawNPCs()
             npc.y,
             48, 48
         )
+    end
+end
+
+function OverworldState:drawEnemies()
+    local enemies = self.engine.models.physics.objects.enemies
+    if enemies then
+        for _, enemy in pairs(enemies) do
+            love.graphics.setColor(255, 0, 0, 255)
+            love.graphics.circle(
+                'fill',
+                enemy.body:getX(),
+                enemy.body:getY(),
+                enemy.shape:getRadius(),
+                16
+            )
+        end
     end
 end
 
@@ -103,7 +120,7 @@ end
 function OverworldState:drawPlayer()
     local player = self.engine.models.physics.objects.player
     if player then
-        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.setColor(0, 0, 0, 255)
         love.graphics.circle(
             'fill',
             player.body:getX(),
@@ -115,15 +132,18 @@ function OverworldState:drawPlayer()
 end
 
 function OverworldState:drawBullets()
-    local bulletManager = self.engine.models.bulletManager
-    love.graphics.setColor(255, 0, 0, 255)
-    for i, bullet in ipairs(bulletManager.bullets) do
-        love.graphics.rectangle(
-            'fill',
-            bullet.x,
-            bullet.y,
-            8, 8
-        )
+    local bullets = self.engine.models.physics.objects.bullets
+    if bullets then
+        for uuid, bullet in pairs(bullets) do
+            love.graphics.setColor(50, 50, 50, 255)
+            love.graphics.circle(
+                'fill',
+                bullet.body:getX(),
+                bullet.body:getY(),
+                bullet.shape:getRadius(),
+                16
+            )
+        end
     end
 end
 
@@ -156,7 +176,12 @@ function OverworldState:drawVertexGroups()
     local vertexGroups = self.engine.models.physics.vertexGroups
 
     for i, vertexGroup in ipairs(vertexGroups) do
-        love.graphics.setColor(255, 0, 0, 255)
+        love.graphics.setColor(
+            vertexGroup.color.r,
+            vertexGroup.color.g,
+            vertexGroup.color.b,
+            255
+        )
         love.graphics.rectangle(
             'fill',
             vertexGroup.topLeft.x,

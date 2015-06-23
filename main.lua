@@ -2,16 +2,17 @@ local Engine = require('lib/eventengine')
 
 function love.load()
     engine = Engine:new()
-    engine:addImage('tilesheet', love.graphics.newImage('assets/tilesheet.png'))
+    engine:addImage('tilesheet', love.graphics.newImage('assets/tilesheet-test.png'))
     engine:addModels({
-        player=require('models/player'),
-        key=require('models/key'),
-        bulletManager=require('models/bullet-manager'),
-        map=require('models/map'),
-        npc=require('models/npc'),
-        dialog=require('models/dialog'),
-        physics=require('models/physics'),
-        flag=require('models/flag'),
+        player = require('models/player'),
+        key = require('models/key'),
+        bullet = require('models/bullet'),
+        map = require('models/map'),
+        npc = require('models/npc'),
+        dialog = require('models/dialog'),
+        physics = require('models/physics'),
+        flag = require('models/flag'),
+        enemy = require('models/enemy'),
     })
     engine:addStates({
         --title=require('states/title'),

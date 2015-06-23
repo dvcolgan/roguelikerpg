@@ -17,8 +17,18 @@ end
 
 function Physics:clearObjects()
     if self.objects.map then
-        for i, object in ipairs(self.objects.map) do
+        for i, object in pairs(self.objects.map) do
             object.body:destroy()
+        end
+    end
+    if self.objects.enemies then
+        for uuid, enemy in pairs(self.objects.enemies) do
+            enemy.body:destroy()
+        end
+    end
+    if self.objects.bullets then
+        for uuid, bullet in pairs(self.objects.bullets) do
+            bullet.body:destroy()
         end
     end
     if self.objects.player then
@@ -27,7 +37,7 @@ function Physics:clearObjects()
     self.objects = {}
 end
 
-function Physics:onRoomLoaded()
+function Physics:onEnemiesLoaded()
     local map = self.engine.models.map
     self.vertexGroups = MarchingSquares:new(map.collision):findMapBoxVertexGroups()
 
@@ -44,6 +54,21 @@ function Physics:onRoomLoaded()
         object.fixture = love.physics.newFixture(object.body, object.shape)
         table.insert(self.objects.map, object)
     end
+
+    local enemiesPhysics = {}
+    local enemies = self.engine.models.enemy.enemies
+    for uuid, enemy in pairs(enemies) do
+        local enemyPhysics = {}
+        enemyPhysics.body = love.physics.newBody(self.world, enemy.x, enemy.y, 'dynamic')
+        enemyPhysics.body:setLinearDamping(10)
+        enemyPhysics.body:setX(enemy.x)
+        enemyPhysics.body:setY(enemy.y)
+        enemyPhysics.shape = love.physics.newCircleShape(enemy.radius)
+        enemyPhysics.fixture = love.physics.newFixture(enemyPhysics.body, enemyPhysics.shape, 1)
+        enemyPhysics.fixture:setRestitution(0.2)
+        enemiesPhysics[uuid] = enemyPhysics
+    end
+    self.objects.enemies = enemiesPhysics
 
     local playerPhysics = {}
     local player = self.engine.models.player
@@ -76,6 +101,24 @@ function Physics:onRoomLoaded()
     playerPhysics.fixture = love.physics.newFixture(playerPhysics.body, playerPhysics.shape, 1)
     playerPhysics.fixture:setRestitution(0.2)
     self.objects.player = playerPhysics
+
+    self.objects.bullets = {}
+end
+
+function Physics:onBulletFired(uuid, bullet)
+    local bulletPhysics = {}
+    bulletPhysics.body = love.physics.newBody(self.world, bullet.x, bullet.y, 'dynamic')
+    bulletPhysics.body:setX(bullet.x)
+    bulletPhysics.body:setY(bullet.y)
+    bulletPhysics.shape = love.physics.newCircleShape(bullet.damage)
+    bulletPhysics.fixture = love.physics.newFixture(bulletPhysics.body, bulletPhysics.shape, 1)
+    bulletPhysics.fixture:setRestitution(0.3)
+    self.objects.bullets[uuid] = bulletPhysics
+end
+
+function Physics:onBulletTimeout(uuid)
+    self.objects.bullets[uuid].body:destroy()
+    self.objects.bullets[uuid] = nil
 end
 
 function Physics:onUpdate(dt)

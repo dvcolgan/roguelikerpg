@@ -1,3 +1,56 @@
+Setting ideas:
+victorian era prison ship
+steampunk
+you get different parts to upgrade your suit
+
+There are no human guards on the ship, and the only humans are the prisoners
+You have to go through rooms destroying the robot guards
+
+
+Gameplay:
+you attack robots and they drop parts or gears
+gears are the unit of currency
+you can pay other prisoners at their shops with gears and buy parts specifically
+you could have keys just because every game needs keys
+
+keys
+bombs
+
+you have no memory and you have to figure out why you are on the ship
+in order to get the full story, you have to keep playing through multiple times
+
+the ship's layout is generated on game start, and there are 5 floors of a certain number of rooms each, and there is always a fixed number of rooms.  The contents are always random, but there are certain room clusters like:
+    kitchen
+    cells
+    engine room
+    torpedo room
+    bathrooms
+    solitary confinement
+    exercise rooms
+    deck
+    trash compactor
+    store room
+    execution room
+    graveyard
+    infirmary
+    laundry room
+    security center with screens
+    keel
+    captain's quarters
+    crew's quarters
+    lifeboats
+    chapel
+    workshop
+    storage
+    armory
+    library
+    lookout tower
+    bridge
+    hallways
+    bed rooms
+
+
+
 List of things David doesn't like in games
 turn based combat
 long lasting not undoable decisions
