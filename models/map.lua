@@ -114,7 +114,7 @@ end
 
 
 function Map:onRoomNeeded(floor, key)
-    print(floor)
+    print(floor, key)
     local roomData = self.thisRunsRooms[floor][key]
     self.currentRoom.layers = roomData.layers
     self.currentRoom.collision = roomData.collision
