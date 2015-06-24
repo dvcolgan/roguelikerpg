@@ -2,7 +2,7 @@ local Engine = require('lib/eventengine')
 
 function love.load()
     engine = Engine:new()
-    engine:addImage('tilesheet', love.graphics.newImage('assets/tilesheet-test.png'))
+    engine:addImage('tilesheet', love.graphics.newImage('assets/tilesheet.png'))
     engine:addModels({
         player = require('models/player'),
         key = require('models/key'),
@@ -21,16 +21,13 @@ function love.load()
     engine:setState('overworld', {doUpdate=true, doDraw=true})
 end
 
-
 function love.draw()
     engine:draw()
 end
 
-
 function love.update(dtInSec)
     engine:update(dtInSec)
 end
-
 
 function love.keypressed(key)
     if key == 'escape' then
@@ -41,7 +38,6 @@ function love.keypressed(key)
         engine:trigger('keyDown', key)
     end
 end
-
 
 function love.keyreleased(key)
     if key == ' ' then key = 'space' end
