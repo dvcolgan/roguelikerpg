@@ -1,3 +1,59 @@
+-- Import for gameplay
+make bullets disappear when then hit something that is damaged by them
+zelda gb inventory system
+ability to talk to npcs
+add animations
+profile to figure out what causes the slow start
+
+144 rooms total
+D = Deck
+L = Lookout
+R = Normal room
+Lookout
+   0  1  2  3  4  5  6  7  8  9
+0                              
+1          [L]         [L]      
+2       [L][L]         [L][L]   
+3          [L]         [L]      
+4                              
+Upper Deck
+   0  1  2  3  4  5  6  7  8  9
+0       [D][D]         [D][D]   
+1    [D][D][D]         [D][D][D]
+2 [D][D][D][D]         [D][D][D]
+3    [D][D][D]         [D][D][D]
+4       [D][D]         [D][D]   
+
+Middle deck and first floor
+   0  1  2  3  4  5  6  7  8  9
+0       [R][R][D][D][D][R][R]   
+1    [R][R][R][D][D][D][R][R][R]
+2 [R][R][R][R][D][D][D][R][R][R]
+3    [R][R][R][D][D][D][R][R][R]
+4       [R][R][D][D][D][R][R]   
+
+Main Floor
+   0  1  2  3  4  5  6  7  8  9
+0       [R][R][R][R][R][R][R]   
+1    [R][R][R][R][R][R][R][R][R]
+2 [R][R][R][R][R][R][R][R][R][R]
+3    [R][R][R][R][R][R][R][R][R]
+4       [R][R][R][R][R][R][R]   
+
+Cargo hold
+   0  1  2  3  4  5  6  7  8  9
+0                               
+1       [R][R][R][R][R][R][R][R]
+2    [R][R][R][R][R][R][R][R][R]
+3       [R][R][R][R][R][R][R][R]
+4                               
+
+
+
+
+
+
+
 Setting ideas:
 victorian era prison ship
 steampunk
@@ -151,15 +207,6 @@ Maybe all of your stats are determined by the items you pick up, and you can at 
 
 
 
-
--- Import for gameplay
-zelda gb inventory system
-ability to talk to npcs
-add enemies
-add physics to enemies
-add inventory
-add animations
-profile to figure out what causes the slow start
 
 -- Someday features
 add tanks with cowboy hat on top

@@ -3,9 +3,6 @@ local Engine = require('lib/eventengine')
 function love.load()
     engine = Engine:new()
     engine:addImage('tilesheet', love.graphics.newImage('assets/tilesheet-test.png'))
-    local background = love.graphics.newImage('assets/squared_metal.png')
-    background:setWrap('repeat', 'repeat')
-    engine:addImage('background', background)
     engine:addModels({
         player = require('models/player'),
         key = require('models/key'),
