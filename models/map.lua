@@ -127,9 +127,15 @@ end
 function Map:tileAt(col, row, layer)
     local layerData = self.currentRoom.layers[layer]
     if layerData then
-        local index = (row-1) * G.ROOM_WIDTH + col return layerData[index]
+        local index = (row-1) * G.ROOM_WIDTH + col
+        return layerData[index]
     end
     return nil
+end
+
+function Map:onChangeTile(col, row, layer, tile)
+    local index = (row-1) * G.ROOM_WIDTH + col
+    self.currentRoom.layers[layer][index] = tile
 end
 
 return Map

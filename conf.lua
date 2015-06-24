@@ -19,6 +19,4 @@ function love.conf(t)
     t.window.y = 40
     t.window.highdpi = false
     t.window.srgb = false
-
-    t.modules.mouse = false
 end

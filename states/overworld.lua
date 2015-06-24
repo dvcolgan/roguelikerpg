@@ -49,6 +49,7 @@ function OverworldState:draw()
     self:drawEnemies()
     self:drawBullets()
     self:drawDialog()
+    self:drawEditor()
     --self:drawVertexGroups()
     --self:drawInventory()
 end
@@ -218,6 +219,49 @@ function OverworldState:drawInventory()
         boxWidth - 16, boxHeight - 16,
         10, 10
     )
+end
+
+function OverworldState:drawEditor()
+    local editor = self.engine.models.editor
+    if editor.editing then
+        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.print('Editing', 20, 20)
+
+        -- Draw tile selection overlay
+        if editor.showTiles then
+            love.graphics.draw(
+                self.engine.images.tilesheetSmall,
+                0, 0
+            )
+        end
+
+        local cursorX, cursorY, tileSize
+        if editor.showTiles then
+            tileSize = G.EDITOR_TILE_SIZE
+            cursorX = (editor.hoveredTilesheetTile.col - 1) * tileSize
+            cursorY = (editor.hoveredTilesheetTile.row - 1) * tileSize
+        else
+            tileSize = G.TILE_SIZE
+            cursorX = (editor.hoveredRoomTile.col - 1) * tileSize
+            cursorY = (editor.hoveredRoomTile.row - 1) * tileSize
+        end
+
+        -- Draw cursor
+        love.graphics.setLineWidth(6)
+        love.graphics.setColor(0, 0, 0, 255)
+        love.graphics.rectangle(
+        'line',
+        cursorX, cursorY,
+        tileSize, tileSize
+        )
+        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.setLineWidth(2)
+        love.graphics.rectangle(
+        'line',
+        cursorX, cursorY,
+        tileSize, tileSize
+        )
+    end
 end
 
 return OverworldState

@@ -1,5 +1,6 @@
 return {
     TILE_SIZE = 64,
+    EDITOR_TILE_SIZE = 32,
     ROOM_WIDTH = 15,
     ROOM_HEIGHT = 9,
     COLLISION = {

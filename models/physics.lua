@@ -12,6 +12,7 @@ function Physics:initialize(engine)
     love.physics.setMeter(G.TILE_SIZE)
     self.world = love.physics.newWorld(0, 0, true)
     self.objects = {}
+    self.paused = false
 end
 
 
@@ -138,6 +139,7 @@ function Physics:onBulletTimeout(uuid)
 end
 
 function Physics:onUpdate(dtInSec)
+    if self.paused then return end
     self.world:update(dtInSec)
 
     local player = self.engine.models.player
@@ -182,6 +184,14 @@ function Physics:onUpdate(dtInSec)
         self.engine:trigger('roomChange', 0, -1)
         self:clearObjects()
     end
+end
+
+function Physics:onPausePhysics()
+    self.paused = true
+end
+
+function Physics:onResumePhysics()
+    self.paused = false
 end
 
 return Physics
