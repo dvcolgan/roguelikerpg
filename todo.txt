@@ -5,6 +5,17 @@ ability to talk to npcs
 add animations
 profile to figure out what causes the slow start
 
+Making levels
+Click on make new level
+Choose a tileset/theme
+place tiles
+place enemies
+maybe also have a cutscene editor or something
+when done hit save and it writes the level out to a lua file
+be able to, when in a level, hit tab and it
+    opens the level editor for that level right away, resets the room, and lets you change things, then when you hit tab again it resets the room and lets you play
+
+
 144 rooms total
 D = Deck
 L = Lookout

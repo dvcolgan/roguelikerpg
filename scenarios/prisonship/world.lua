@@ -4,7 +4,14 @@ return {
         D = 'deck',
         I = 'interior',
         H = 'hold',
-    }
+    },
+    start = {
+        floor = 3,
+        col = 6,
+        row = 3
+    },
+    floorWidth = 10,
+    floorHeight = 5,
     floors = {
         [1] = {
             name = 'Lookout',

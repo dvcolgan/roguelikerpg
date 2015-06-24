@@ -17,7 +17,7 @@ function Enemy:onRoomChange()
 end
 
 function Enemy:onMapLoaded()
-    for i, enemy in ipairs(self.engine.models.map.enemies) do
+    for i, enemy in ipairs(self.engine.models.map.currentRoom.enemies) do
         local enemyTemplate = self.enemyTemplates[enemy.key]
         local uuid = util.uuid()
         self.enemies[uuid] = {

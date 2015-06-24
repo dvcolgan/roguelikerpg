@@ -4,38 +4,34 @@ local G = require('constants')
 
 local Map = class('Map')
 
-
 function Map:initialize(engine)
     self.engine = engine
+    self.quads = {}
+    
+    self.worldTemplate = require('scenarios/prisonship/world')
     self.roomTemplates = {}
-    self.rooms = {}
-    self.enemies = {}
-    self.items = {}
+    self.thisRunsRooms = {}
 
-    -- TODO this code is duplicated in item
-    roomFileNames = love.filesystem.getDirectoryItems('scenarios/prisonship/rooms')
-    for i, roomFileName in ipairs(roomFileNames) do
-        if not string.find(roomFileName, '%.swp$') then
-            _, _, roomName = string.find(roomFileName, '(.*).lua')
-            requirePath = 'scenarios/prisonship/rooms/' .. string.gsub(roomFileName, '.lua', '')
-            self.roomTemplates[roomName] = require(requirePath)
-        end
-    end
-    for name, room in pairs(self.roomTemplates) do
-        print(name, room)
-    end
-
-    self.rooms = {
-        ['0x0'] = self.roomTemplates.deck1
+    self.currentRoom = {
+        layers = {},
+        collision = {},
+        enemies = {},
+        items = {},
     }
 
-    self.roomX = 0
-    self.roomY = 0
-    self.lastRoomX = 0
-    self.lastRoomY = 0
+    self.currentCol = self.worldTemplate.start.col
+    self.currentRow = self.worldTemplate.start.row
+    self.currentFloor = self.worldTemplate.start.floor
+    self.lastCol = self.col
+    self.lastRow = self.row
+    self.lastFloor = self.floor
 
-    self.layers = {}
+    self:parseTileset()
+    self:loadRoomTemplates()
+    self:generateThisRunsRooms()
+end
 
+function Map:parseTileset()
     -- Parse the tileset into quads
     self.quads = {}
     local tilesheet = engine.images.tilesheet
@@ -61,30 +57,75 @@ function Map:initialize(engine)
     end
 end
 
-function Map:onRoomChange(dx, dy)
-    self.lastRoomX = self.roomX
-    self.lastRoomY = self.roomY
-    self.roomX = self.roomX + dx
-    self.roomY = self.roomY + dy
-    local key = tostring(self.roomX) .. 'x' .. tostring(self.roomY)
-    if self.rooms[key] then
-        self.engine:trigger('roomNeeded', key)
+function Map:loadRoomTemplates()
+    self.roomTemplates = {}
+
+    for char, roomType in pairs(self.worldTemplate.roomTypes) do
+        local roomsForType = {}
+
+        roomFileNames = love.filesystem.getDirectoryItems('scenarios/prisonship/rooms/' .. roomType)
+        for i, roomFileName in ipairs(roomFileNames) do
+            if not string.find(roomFileName, '%.swp$') then
+                _, _, roomName = string.find(roomFileName, '(.*).lua')
+                requirePath = 'scenarios/prisonship/rooms/' .. roomType .. '/' .. roomName
+                table.insert(roomsForType, require(requirePath))
+            end
+        end
+        self.roomTemplates[roomType] = roomsForType
+    end
+end
+
+function Map:chooseRandomRoom(roomType)
+    local roomsOfType = self.roomTemplates[roomType]
+    return roomsOfType[math.random(#roomsOfType)]
+end
+
+function Map:generateThisRunsRooms()
+    self.thisRunsRooms = {}
+    for which, floorTemplate in pairs(self.worldTemplate.floors) do
+        local floor = {}
+        local i = 1
+        for row = 1, self.worldTemplate.floorHeight do
+            for col = 1, self.worldTemplate.floorWidth do
+                local key = tostring(col) .. 'x' .. tostring(row)
+                local char = floorTemplate.rooms[i]
+                local roomType = self.worldTemplate.roomTypes[char]
+                if roomType ~= nil then
+                    floor[key] = self:chooseRandomRoom(roomType)
+                end
+                i = i + 1
+            end
+        end
+        self.thisRunsRooms[which] = floor
+    end
+end
+
+function Map:onRoomChange(dCol, dRow, dFloor)
+    self.lastCol = self.currentCol
+    self.lastRow = self.currentRow
+    self.lastFloor = self.currentFloor
+    self.currentCol = self.currentCol + dCol
+    self.currentRow = self.currentRow + dRow
+    local key = tostring(self.currentCol) .. 'x' .. tostring(self.currentRow)
+    if self.thisRunsRooms[self.currentFloor][key] then
+        self.engine:trigger('roomNeeded', self.currentFloor, key)
     end
 end
 
 
-function Map:onRoomNeeded(key)
-    local roomData = self.rooms[key]
-    self.layers = roomData.layers
-    self.collision = roomData.collision
-    self.enemies = roomData.enemies
-    self.items = roomData.items
+function Map:onRoomNeeded(floor, key)
+    print(floor)
+    local roomData = self.thisRunsRooms[floor][key]
+    self.currentRoom.layers = roomData.layers
+    self.currentRoom.collision = roomData.collision
+    self.currentRoom.enemies = roomData.enemies
+    self.currentRoom.items = roomData.items
     roomData.script(self.engine)
     self.engine:trigger('mapLoaded')
 end
 
 function Map:tileAt(col, row, layer)
-    local layerData = self.layers[layer]
+    local layerData = self.currentRoom.layers[layer]
     if layerData then
         local index = (row-1) * G.ROOM_WIDTH + col return layerData[index]
     end

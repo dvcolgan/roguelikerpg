@@ -39,7 +39,7 @@ end
 
 function Physics:onEnemiesLoaded()
     local map = self.engine.models.map
-    self.vertexGroups = MarchingSquares:new(map.collision):findMapBoxVertexGroups()
+    self.vertexGroups = MarchingSquares:new(map.currentRoom.collision):findMapBoxVertexGroups()
 
     self.objects.map = {}
     for i, vertexGroup in ipairs(self.vertexGroups) do
@@ -78,19 +78,19 @@ function Physics:onEnemiesLoaded()
     playerPhysics.body = love.physics.newBody(self.world, player.x, player.y, 'dynamic')
     playerPhysics.body:setLinearDamping(10)
 
-    if map.roomY < map.lastRoomY then
+    if map.currentRow < map.lastRow then
         -- went up
         playerPhysics.body:setX(player.lastX)
         playerPhysics.body:setY(G.ROOM_HEIGHT * G.TILE_SIZE - 1)
-    elseif map.roomY > map.lastRoomY then
+    elseif map.currentRow > map.lastRow then
         -- went down
         playerPhysics.body:setX(player.lastX)
         playerPhysics.body:setY(0)
-    elseif map.roomX < map.lastRoomX then
+    elseif map.currentCol < map.lastCol then
         -- went left
         playerPhysics.body:setX(G.ROOM_WIDTH * G.TILE_SIZE - 1)
         playerPhysics.body:setY(player.lastY)
-    elseif map.roomX > map.lastRoomX then
+    elseif map.currentCol > map.lastCol then
         -- went right
         playerPhysics.body:setX(0)
         playerPhysics.body:setY(player.lastY)
