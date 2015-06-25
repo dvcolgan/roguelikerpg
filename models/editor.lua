@@ -9,6 +9,7 @@ function Editor:initialize(engine)
     self.editing = false
     self.selectedTile = 0
     self.showTiles = false
+    self.selectedLayer = 1
     self.hoveredRoomTile = {
         col = 0,
         row = 0,
@@ -37,10 +38,24 @@ function Editor:onMouseDown(x, y, button)
 end
 
 function Editor:onMouseMove(x, y, dx, dy)
-    self.hoveredRoomTile.col = math.floor(x / G.TILE_SIZE) + 1
-    self.hoveredRoomTile.row = math.floor(y / G.TILE_SIZE) + 1
-    self.hoveredTilesheetTile.col = math.floor(x / G.EDITOR_TILE_SIZE) + 1
-    self.hoveredTilesheetTile.row = math.floor(y / G.EDITOR_TILE_SIZE) + 1
+    if self.editing then
+        self.hoveredRoomTile.col = math.floor(x / G.TILE_SIZE) + 1
+        self.hoveredRoomTile.row = math.floor(y / G.TILE_SIZE) + 1
+        self.hoveredTilesheetTile.col = math.floor(x / G.EDITOR_TILE_SIZE) + 1
+        self.hoveredTilesheetTile.row = math.floor(y / G.EDITOR_TILE_SIZE) + 1
+        print(love.mouse.isDown('l'))
+        if love.mouse.isDown('l') then
+            if not self.showTiles then
+                self.engine:trigger(
+                    'changeTile',
+                    self.hoveredRoomTile.col,
+                    self.hoveredRoomTile.row,
+                    1,
+                    self.selectedTile
+                )
+            end
+        end
+    end
 end
 
 function Editor:onKeyDown(key)
@@ -48,6 +63,7 @@ function Editor:onKeyDown(key)
         if self.editing then
             self.engine:trigger('giveBackControls')
             self.engine:trigger('resumePhysics')
+            self.engine:trigger('saveRoomTemplates')
         else
             self.engine:trigger('takeAwayControls')
             self.engine:trigger('pausePhysics')
@@ -57,6 +73,17 @@ function Editor:onKeyDown(key)
     if key == 'lctrl' or key == 'rctrl' then
         self.showTiles = true
     end
+
+    if key == '0' then self.selectedLayer = 0 end
+    if key == '1' then self.selectedLayer = 1 end
+    if key == '2' then self.selectedLayer = 2 end
+    if key == '3' then self.selectedLayer = 3 end
+    if key == '4' then self.selectedLayer = 4 end
+    if key == '5' then self.selectedLayer = 5 end
+    if key == '6' then self.selectedLayer = 6 end
+    if key == '7' then self.selectedLayer = 7 end
+    if key == '8' then self.selectedLayer = 8 end
+    if key == '9' then self.selectedLayer = 9 end
 end
 
 function Editor:onKeyUp(key)

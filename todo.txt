@@ -1,4 +1,8 @@
 -- Import for gameplay
+level editor:
+    support writing out things to files
+    cutscene editor
+
 make the walls dynamically have doors or not depending on if they are on the edge of the map
 make bullets disappear when then hit something that is damaged by them
 zelda gb inventory system

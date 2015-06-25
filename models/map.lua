@@ -9,7 +9,7 @@ function Map:initialize(engine)
     self.quads = {}
     
     self.worldTemplate = require('scenarios/prisonship/world')
-    self.roomTemplates = {}
+    self.roomTemplates = require('scenarios/prisonship/rooms')
     self.thisRunsRooms = {}
 
     self.currentRoom = {
@@ -27,7 +27,6 @@ function Map:initialize(engine)
     self.lastFloor = self.floor
 
     self:parseTileset()
-    self:loadRoomTemplates()
     self:generateThisRunsRooms()
 end
 
@@ -57,26 +56,10 @@ function Map:parseTileset()
     end
 end
 
-function Map:loadRoomTemplates()
-    self.roomTemplates = {}
-
-    for char, roomType in pairs(self.worldTemplate.roomTypes) do
-        local roomsForType = {}
-
-        roomFileNames = love.filesystem.getDirectoryItems('scenarios/prisonship/rooms/' .. roomType)
-        for i, roomFileName in ipairs(roomFileNames) do
-            if not string.find(roomFileName, '%.swp$') then
-                _, _, roomName = string.find(roomFileName, '(.*).lua')
-                requirePath = 'scenarios/prisonship/rooms/' .. roomType .. '/' .. roomName
-                table.insert(roomsForType, require(requirePath))
-            end
-        end
-        self.roomTemplates[roomType] = roomsForType
-    end
-end
-
 function Map:chooseRandomRoom(roomType)
+    print(roomType)
     local roomsOfType = self.roomTemplates[roomType]
+    print(self.roomTemplates)
     return roomsOfType[math.random(#roomsOfType)]
 end
 
@@ -91,6 +74,7 @@ function Map:generateThisRunsRooms()
                 local char = floorTemplate.rooms[i]
                 local roomType = self.worldTemplate.roomTypes[char]
                 if roomType ~= nil then
+                    roomType = 'deck'
                     floor[key] = self:chooseRandomRoom(roomType)
                 end
                 i = i + 1
@@ -136,6 +120,58 @@ end
 function Map:onChangeTile(col, row, layer, tile)
     local index = (row-1) * G.ROOM_WIDTH + col
     self.currentRoom.layers[layer][index] = tile
+end
+
+function Map:onSaveRoomTemplates()
+    local file, err = io.open(
+        'scenarios/prisonship/rooms.lua', 'wb'
+    )
+    if err then return err end
+
+    file:write('return {\n')
+
+    for roomType, rooms in pairs(self.roomTemplates) do
+        file:write('    ' .. roomType .. ' = {\n')
+        for i, room in ipairs(rooms) do
+            file:write('        {\n')
+
+            file:write('            layers = {\n')
+            for i, layer in ipairs(room.layers) do
+                file:write('                {\n')
+                local num = 0
+                for i, tile in ipairs(layer) do
+                    file:write(tostring(tile) .. ', ')
+                    num = num + 1
+                    if num % G.ROOM_WIDTH == 0 then file:write('\n') end
+                end
+                file:write('                },\n')
+            end
+            file:write('            },\n')
+
+            file:write('            collision = {\n')
+            local num = 0
+            for i, tile in ipairs(room.collision) do
+                file:write(tostring(tile) .. ', ')
+                num = num + 1
+                if num % G.ROOM_WIDTH == 0 then file:write('\n') end
+            end
+            file:write('            },\n')
+
+            file:write('            enemies = {\n')
+            for i, enemy in ipairs(room.enemies) do
+                file:write("                {key = '" .. enemy.key .. "', col = " .. tostring(enemy.col) .. ", row = " .. tostring(enemy.row) .. "},\n")
+            end
+            file:write('            },\n')
+
+            file:write('            items = {},\n')
+            file:write('            script = function(engine) end,\n')
+
+            file:write('        },\n')
+        end
+        file:write('    },\n')
+    end
+
+    file:write('}\n')
 end
 
 return Map
