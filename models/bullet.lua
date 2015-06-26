@@ -5,7 +5,6 @@ local util = require('util')
 
 local Bullet = class('Bullet')
 
-
 function Bullet:initialize(engine)
     self.engine = engine
     self.bullets = {}

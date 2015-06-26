@@ -14,6 +14,7 @@ function Player:initialize(engine)
     self.maxSpeed = 3
     self.frozen = false
     self.damage = 10
+    self.gears = 0
 end
 
 function Player:onTakeAwayControls()

@@ -46,6 +46,7 @@ end
 function OverworldState:draw()
     love.graphics.clear()
     self:drawTileMap()
+    self:drawGears()
     self:drawPlayer()
     self:drawNPCs()
     self:drawEnemies()
@@ -54,6 +55,23 @@ function OverworldState:draw()
     self:drawMinimap()
     self:drawEditor()
     --self:drawInventory()
+end
+
+function OverworldState:drawGears()
+    local gears = self.engine.models.physics.objects.gears
+    local sprite = self.engine.images.gear
+    if gears then
+        for uuid, gear in pairs(gears) do
+            love.graphics.draw(sprite,
+                gear.body:getX(),
+                gear.body:getY(),
+                gear.body:getAngle(),
+                1, 1,
+                G.GEAR_SIZE / 2,
+                G.GEAR_SIZE / 2
+            )
+        end
+    end
 end
 
 function OverworldState:drawNPCs()

@@ -5,6 +5,7 @@ return {
         name = 'Scout',
         fireRate = 1,
         damage = 10,
+        gears = 5,
     },
     drone = {
         hp = 20,
@@ -12,5 +13,6 @@ return {
         name = 'Sentry Drone',
         fireRate = 2,
         damage = 20,
+        gears = 5,
     },
 }

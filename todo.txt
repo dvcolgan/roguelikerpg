@@ -1,13 +1,95 @@
 Features:
     inventory:
+        add throwing stars that rotate offcenter
         view the inventory
         select items in the inventory
         consumables (keys, bombs)?
+        use the mouse to move items around
+        all items stay the same in value, and higher cost items in general are better
+        each number key is an item slot, hit the key over an item to switch it out with another
+        if parts are only for a certain slot, just hit the swap key?
+        as you kill more enemies, you get a higher amount of total value, and selling things allows you to replace your current suit pieces with better ones
+        your suit can have one of each type of thing?
+            helmet
+            gauntlets
+            boots
+            pants
+            shirt
+            bracelet
+            visor
+            ring
+            necklace
+            underwear
+            weapon
+            offhand
+        your weapon can also be upgraded and customized
+            trigger
+            stock
+            barrel
+            ammo
+            sight
+            bayonette/melee thing (put a baseball bat on the front of your gun?)
+            no limited ammo
+            reload rate
+            silencer
+        weapon attributes:
+            fire rate
+            knockback amount
+            bullet size
+            fire pattern (double, triple, quad shot, etc)
+            damage
+            fire speed
+            range
+            bullet type:
+                bouncing, explosive (area of affect), piercing, spectral
+
+
+
+    add ngccgui
+
 
     combat:
+        use the mouse to aim, click to fire
+
+        Backstory:
+            You are a prisoner on a prison ship, and you have just realized
+            that the ship has been abandoned, and it is also sinking somehow
+            If you don't get off the ship before 1 hour you lose, and your
+            score is determined mostly by how fast you get off the ship?
+
+            The other prisoners are npcs and are also trying to get off the ship, and you can trade parts with them as they try to escape too?
+            Maybe even be competitive with them?
+
+            Why are robots attacking?
+            It could add a sense of urgency if there is a countdown timer,
+            and the ship feels like it is falling apart (screen shake), and
+            occasionally there are cutscenes of more structural damage.
+
+            Every few time intervals (10 minutes or so), there is a short
+            cutscene and the ship changes somehow (is more broken up, more
+            fires, etc)
+            Robots get stronger/weaker depending on how much time has gone past?
+            Certain rooms become impassable? (wouldn't be a problem necessarily if there are many routes through the ship)
+
+        overarching goal: you are assembling your power suit parts
+            to be strong enough to take out the final boss whenever you feel like it
+            you could try to speedrun if you wanted, or wait until you are
+            way op to fight the boss
+
+            the big boss is guarding the lifeboats and you have to get past
+            it to get off the boat
+        there is a timer above the boat at all times, maybe there is an 
+            incentive somehow to get off quickly
+
+        cutscenes happen as you enter rooms and don't take away your controls
+        or cutscenes don't increment the timer?
+
+
         make bullets disappear when then hit something that is damaged by them
         use items from the inventory
         shoot in directions
+        make enemies drop a gear every time a certain amount of damage threshold has passed
+            enemy has 10 hp and drops 5 gears total, every 2 hp you do the enemy drops a gear
 
     animations:
         player animations
