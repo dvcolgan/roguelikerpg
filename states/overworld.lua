@@ -51,8 +51,8 @@ function OverworldState:draw()
     self:drawEnemies()
     self:drawBullets()
     self:drawDialog()
-    self:drawEditor()
     self:drawMinimap()
+    self:drawEditor()
     --self:drawInventory()
 end
 

@@ -23,10 +23,13 @@ end
 function Editor:onMouseDown(x, y, button)
     if self.editing then
         if self.selectedLayer == 0 then
+            local collidable
+            if button == 'l' then collidable = 1 elseif button == 'r' then collidable = 0 end
             self.engine:trigger(
-                'toggleCollision',
+                'changeCollision',
                 self.hoveredRoomTile.col,
-                self.hoveredRoomTile.row
+                self.hoveredRoomTile.row,
+                collidable
             )
         else
             if self.showTiles then
@@ -51,15 +54,31 @@ function Editor:onMouseMove(x, y, dx, dy)
         self.hoveredRoomTile.row = math.floor(y / G.TILE_SIZE) + 1
         self.hoveredTilesheetTile.col = math.floor(x / G.EDITOR_TILE_SIZE) + 1
         self.hoveredTilesheetTile.row = math.floor(y / G.EDITOR_TILE_SIZE) + 1
-        if love.mouse.isDown('l') then
-            if not self.showTiles then
+        if self.selectedLayer == 0 then
+            local collidable
+            local button = nil
+            if love.mouse.isDown('l') then button = 'l' end
+            if love.mouse.isDown('r') then button = 'r' end
+            if button then
+                if button == 'l' then collidable = 1 elseif button == 'r' then collidable = 0 end
                 self.engine:trigger(
-                    'changeTile',
+                    'changeCollision',
                     self.hoveredRoomTile.col,
                     self.hoveredRoomTile.row,
-                    1,
-                    self.selectedTile
+                    collidable
                 )
+            end
+        else
+            if love.mouse.isDown('l') then
+                if not self.showTiles then
+                    self.engine:trigger(
+                        'changeTile',
+                        self.hoveredRoomTile.col,
+                        self.hoveredRoomTile.row,
+                        1,
+                        self.selectedTile
+                    )
+                end
             end
         end
     end

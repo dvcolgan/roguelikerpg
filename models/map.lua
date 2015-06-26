@@ -125,11 +125,9 @@ function Map:onChangeTile(col, row, layer, tile)
     local index = (row-1) * G.ROOM_WIDTH + col
     self.currentRoom.layers[layer][index] = tile
 end
-function Map:onToggleCollision(col, row)
+function Map:onChangeCollision(col, row, collidable)
     local index = (row-1) * G.ROOM_WIDTH + col
-    local current = self.currentRoom.collision[index]
-    if current == 1 then current = 0 else current = 1 end
-    self.currentRoom.collision[index] = current
+    self.currentRoom.collision[index] = collidable
 end
 
 function Map:onCreateNewRoom()
