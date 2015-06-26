@@ -66,9 +66,7 @@ function OverworldState:drawGears()
                 gear.body:getX(),
                 gear.body:getY(),
                 gear.body:getAngle(),
-                1, 1,
-                G.GEAR_SIZE / 2,
-                G.GEAR_SIZE / 2
+                1, 1
             )
         end
     end
