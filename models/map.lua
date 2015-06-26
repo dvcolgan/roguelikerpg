@@ -57,10 +57,9 @@ function Map:parseTileset()
 end
 
 function Map:chooseRandomRoom(roomType)
-    print(roomType)
     local roomsOfType = self.roomTemplates[roomType]
-    print(self.roomTemplates)
-    return roomsOfType[math.random(#roomsOfType)]
+    local index = math.random(#roomsOfType)
+    return roomsOfType[index], index
 end
 
 function Map:generateThisRunsRooms()
@@ -75,7 +74,8 @@ function Map:generateThisRunsRooms()
                 local roomType = self.worldTemplate.roomTypes[char]
                 if roomType ~= nil then
                     roomType = 'deck'
-                    floor[key] = self:chooseRandomRoom(roomType)
+                    floor[key], index = self:chooseRandomRoom(roomType)
+                    floor[key].index = index
                 end
                 i = i + 1
             end
@@ -98,7 +98,6 @@ end
 
 
 function Map:onRoomNeeded(floor, key)
-    print(floor, key)
     local roomData = self.thisRunsRooms[floor][key]
     self.currentRoom.layers = roomData.layers
     self.currentRoom.collision = roomData.collision
@@ -117,9 +116,59 @@ function Map:tileAt(col, row, layer)
     return nil
 end
 
+function Map:collidableAt(col, row)
+    local index = (row-1) * G.ROOM_WIDTH + col
+    return self.currentRoom.collision[index]
+end
+
 function Map:onChangeTile(col, row, layer, tile)
     local index = (row-1) * G.ROOM_WIDTH + col
     self.currentRoom.layers[layer][index] = tile
+end
+function Map:onToggleCollision(col, row)
+    local index = (row-1) * G.ROOM_WIDTH + col
+    local current = self.currentRoom.collision[index]
+    if current == 1 then current = 0 else current = 1 end
+    self.currentRoom.collision[index] = current
+end
+
+function Map:onCreateNewRoom()
+    local newRoom = {
+        layers = {
+            {
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            }
+        },
+        collision = {
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        },
+        enemies = {},
+        items = {},
+        script = function(engine) end,
+    }
+
+    local key = tostring(self.currentCol) .. 'x' .. tostring(self.currentRow)
+    self.thisRunsRooms[self.currentFloor][key] = newRoom
+    table.insert(self.roomTemplates.deck, newRoom)
+    newRoom.index = #self.roomTemplates.deck
+
+    self.engine:trigger('roomChange', 0, 0, 0)
 end
 
 function Map:onSaveRoomTemplates()

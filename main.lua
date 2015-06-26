@@ -1,3 +1,5 @@
+math.randomseed(os.time())
+
 local Engine = require('lib/eventengine')
 
 function love.load()

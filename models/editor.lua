@@ -22,17 +22,25 @@ end
 
 function Editor:onMouseDown(x, y, button)
     if self.editing then
-        if self.showTiles then
-            local tilesheet = self.engine.images.tilesheetSmall
-            self.selectedTile = (self.hoveredTilesheetTile.row-1) * math.floor(tilesheet:getWidth() / G.EDITOR_TILE_SIZE) + self.hoveredTilesheetTile.col
-        else
+        if self.selectedLayer == 0 then
             self.engine:trigger(
-                'changeTile',
+                'toggleCollision',
                 self.hoveredRoomTile.col,
-                self.hoveredRoomTile.row,
-                1,
-                self.selectedTile
+                self.hoveredRoomTile.row
             )
+        else
+            if self.showTiles then
+                local tilesheet = self.engine.images.tilesheetSmall
+                self.selectedTile = (self.hoveredTilesheetTile.row-1) * math.floor(tilesheet:getWidth() / G.EDITOR_TILE_SIZE) + self.hoveredTilesheetTile.col
+            else
+                self.engine:trigger(
+                    'changeTile',
+                    self.hoveredRoomTile.col,
+                    self.hoveredRoomTile.row,
+                    1,
+                    self.selectedTile
+                )
+            end
         end
     end
 end
@@ -43,7 +51,6 @@ function Editor:onMouseMove(x, y, dx, dy)
         self.hoveredRoomTile.row = math.floor(y / G.TILE_SIZE) + 1
         self.hoveredTilesheetTile.col = math.floor(x / G.EDITOR_TILE_SIZE) + 1
         self.hoveredTilesheetTile.row = math.floor(y / G.EDITOR_TILE_SIZE) + 1
-        print(love.mouse.isDown('l'))
         if love.mouse.isDown('l') then
             if not self.showTiles then
                 self.engine:trigger(
@@ -64,12 +71,16 @@ function Editor:onKeyDown(key)
             self.engine:trigger('giveBackControls')
             self.engine:trigger('resumePhysics')
             self.engine:trigger('saveRoomTemplates')
+            self.engine:trigger('roomChange', 0, 0, 0)
         else
             self.engine:trigger('takeAwayControls')
             self.engine:trigger('pausePhysics')
         end
         self.editing = not self.editing
     end
+
+    if not self.editing then return end
+
     if key == 'lctrl' or key == 'rctrl' then
         self.showTiles = true
     end
@@ -84,6 +95,8 @@ function Editor:onKeyDown(key)
     if key == '7' then self.selectedLayer = 7 end
     if key == '8' then self.selectedLayer = 8 end
     if key == '9' then self.selectedLayer = 9 end
+
+    if key == 'x' then self.engine:trigger('createNewRoom') end
 end
 
 function Editor:onKeyUp(key)

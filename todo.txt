@@ -1,6 +1,14 @@
 -- Import for gameplay
 level editor:
-    support writing out things to files
+    fill tool
+    right click to select tile under the cursor
+    right click and drag to select a rectangle of tiles under the cursor
+    eraser tool
+    select regions of tiles on the tile palate
+    layer editing 
+    make the walls not editable and generated based on adjacent rooms
+    collision editing
+    placing enemies/items
     cutscene editor
 
 make the walls dynamically have doors or not depending on if they are on the edge of the map

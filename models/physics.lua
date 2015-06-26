@@ -39,6 +39,7 @@ function Physics:clearObjects()
 end
 
 function Physics:onEnemiesLoaded()
+    self:clearObjects()
     local map = self.engine.models.map
     self.vertexGroups = MarchingSquares:new(map.currentRoom.collision):findMapBoxVertexGroups()
 
@@ -112,6 +113,8 @@ function Physics:onEnemiesLoaded()
 end
 
 function Physics:onBulletFired(uuid, bullet)
+    if not self.objects.bullets then return end
+
     local bulletPhysics = {}
     bulletPhysics.body = love.physics.newBody(self.world, bullet.x, bullet.y, 'dynamic')
     bulletPhysics.body:setX(bullet.x)

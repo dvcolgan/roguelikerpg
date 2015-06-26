@@ -38,11 +38,13 @@ function love.graphics.roundrect(mode, x, y, width, height, xround, yround)
 end
 
 function OverworldState:create()
+    love.graphics.setBackgroundColor(255, 255, 255)
     love.graphics.setNewFont(18)
     self.engine:trigger('roomChange', 0, 0)
 end
 
 function OverworldState:draw()
+    love.graphics.clear()
     self:drawTileMap()
     self:drawPlayer()
     self:drawNPCs()
@@ -50,7 +52,7 @@ function OverworldState:draw()
     self:drawBullets()
     self:drawDialog()
     self:drawEditor()
-    --self:drawVertexGroups()
+    self:drawMinimap()
     --self:drawInventory()
 end
 
@@ -223,12 +225,41 @@ end
 
 function OverworldState:drawEditor()
     local editor = self.engine.models.editor
+    local map = self.engine.models.map
     if editor.editing then
+        -- Draw the solid parts of the map if we are editing the collision layer
+        if editor.selectedLayer == 0 then
+
+            local collision = self.engine.models.map.currentRoom.collision
+
+            for row = 1, G.ROOM_HEIGHT do
+                for col = 1, G.ROOM_WIDTH do
+                    local collidable = map:collidableAt(col, row)
+                    if collidable == 1 then
+                        love.graphics.setColor(200, 0, 0, 200)
+                        love.graphics.rectangle(
+                            'fill',
+                            math.floor((col-1) * G.TILE_SIZE),
+                            math.floor((row-1) * G.TILE_SIZE),
+                            G.TILE_SIZE, G.TILE_SIZE
+                        )
+                        love.graphics.setColor(255, 0, 0, 200)
+                        love.graphics.rectangle(
+                            'fill',
+                            math.floor((col-1) * G.TILE_SIZE) + 3,
+                            math.floor((row-1) * G.TILE_SIZE) + 3,
+                            G.TILE_SIZE - 6, G.TILE_SIZE - 6
+                        )
+                    end
+                end
+            end
+        end
+
         love.graphics.setColor(255, 255, 255, 255)
-        love.graphics.print('Editing', 20, 20)
 
         -- Draw tile selection overlay
         if editor.showTiles then
+            love.graphics.clear()
             love.graphics.draw(
                 self.engine.images.tilesheetSmall,
                 0, 0
@@ -250,17 +281,72 @@ function OverworldState:drawEditor()
         love.graphics.setLineWidth(6)
         love.graphics.setColor(0, 0, 0, 255)
         love.graphics.rectangle(
-        'line',
-        cursorX, cursorY,
-        tileSize, tileSize
+            'line',
+            cursorX, cursorY,
+            tileSize, tileSize
         )
         love.graphics.setColor(255, 255, 255, 255)
         love.graphics.setLineWidth(2)
         love.graphics.rectangle(
-        'line',
-        cursorX, cursorY,
-        tileSize, tileSize
+            'line',
+            cursorX, cursorY,
+            tileSize, tileSize
         )
+
+        -- Draw message in the upper left
+        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.print('Editing', 20, 20)
+        local message = 'Layer ' .. tostring(editor.selectedLayer)
+        if editor.selectedLayer == 0 then
+            message = 'Layer Collision'
+        end
+        love.graphics.print(message, 20, 50)
+    end
+end
+
+function OverworldState:drawMinimap()
+    local mapX = 4
+    local mapY = 4
+    local roomWidth = 30
+    local roomHeight = 18
+    local padding = 4
+    local map = self.engine.models.map
+    love.graphics.setLineWidth(2)
+
+    local rooms = map.thisRunsRooms[map.currentFloor]
+    if rooms then
+        for row = 1, G.ROOM_HEIGHT do
+            for col = 1, G.ROOM_WIDTH do
+                local key = tostring(col) .. 'x' .. tostring(row)
+
+                local drawX = mapX + col * (roomWidth + padding)
+                local drawY = mapY + row * (roomHeight + padding)
+                local room = rooms[key]
+
+                if room then
+                    if col == map.currentCol and row == map.currentRow then
+                        love.graphics.setColor(0, 0, 0, 255)
+                        love.graphics.rectangle(
+                            'fill',
+                            drawX, drawY,
+                            roomWidth, roomHeight
+                        )
+                    end
+
+                    love.graphics.setColor(255, 255, 255, 255)
+                    love.graphics.print(
+                        tostring(room.index),
+                        drawX + 10, drawY - 2
+                    )
+                    
+                    love.graphics.rectangle(
+                        'line',
+                        drawX, drawY,
+                        roomWidth, roomHeight
+                    )
+                end
+            end
+        end
     end
 end
 
