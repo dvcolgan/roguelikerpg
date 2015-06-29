@@ -17,28 +17,8 @@ end
 
 
 function Physics:clearObjects()
-    if self.objects.map then
-        for i, object in pairs(self.objects.map) do
-            object.body:destroy()
-        end
-    end
-    if self.objects.enemies then
-        for uuid, enemy in pairs(self.objects.enemies) do
-            enemy.body:destroy()
-        end
-    end
-    if self.objects.bullets then
-        for uuid, bullet in pairs(self.objects.bullets) do
-            bullet.body:destroy()
-        end
-    end
-    if self.objects.gears then
-        for uuid, gear in pairs(self.objects.gears) do
-            gear.body:destroy()
-        end
-    end
-    if self.objects.player then
-        self.objects.player.body:destroy()
+    for uuid, object in pairs(self.objects) do
+        object.body:destroy()
     end
     self.objects = {}
 end
@@ -119,8 +99,6 @@ function Physics:onEnemiesLoaded()
 end
 
 function Physics:onBulletFired(uuid, bullet)
-    if not self.objects.bullets then return end
-
     local bulletPhysics = {}
     bulletPhysics.body = love.physics.newBody(self.world, bullet.x, bullet.y, 'dynamic')
     bulletPhysics.body:setX(bullet.x)
@@ -135,16 +113,13 @@ function Physics:onBulletFired(uuid, bullet)
         bulletPhysics.fixture:setMask(G.COLLISION.PLAYER_BULLET, G.COLLISION.ENEMY_BULLET)
     end
     local force = 2000
-    bulletPhysics.body:applyForce(
-        bullet.dx * force,
-        bullet.dy * force
-    )
-    self.objects.bullets[uuid] = bulletPhysics
+    local fx = force * math.cos(bullet.angle)
+    local fy = force * math.sin(bullet.angle)
+    bulletPhysics.body:applyForce(fx, fy)
+    self.objects[uuid] = bulletPhysics
 end
 
 function Physics:onGearDropped(uuid, gear)
-    if not self.objects.gears then return end
-
     local gearPhysics = {}
     gearPhysics.body = love.physics.newBody(self.world, gear.x, gear.y, 'dynamic')
     gearPhysics.body:setX(gear.x)
@@ -163,12 +138,12 @@ function Physics:onGearDropped(uuid, gear)
     local fx = math.random(force * 2) - force
     local fy = math.random(force * 2) - force
     gearPhysics.body:applyForce(fx, fy)
-    self.objects.gears[uuid] = gearPhysics
+    self.objects[uuid] = gearPhysics
 end
 
 function Physics:onBulletTimeout(uuid)
-    self.objects.bullets[uuid].body:destroy()
-    self.objects.bullets[uuid] = nil
+    self.objects[uuid].body:destroy()
+    self.objects[uuid] = nil
 end
 
 function Physics:onUpdate(dtInSec)
@@ -180,7 +155,7 @@ function Physics:onUpdate(dtInSec)
         return
     end
 
-    local playerPhysics = self.objects.player
+    local playerPhysics = self.objects[player.uuid]
     if playerPhysics == nil then return end
     states = self.engine.models.key.states
 

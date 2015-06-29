@@ -1,5 +1,6 @@
 local class = require('middleclass')
 local G = require('constants')
+local vector = require('vector')
 
 
 local Player = class('Player')
@@ -33,14 +34,18 @@ function Player:onUpdate(dtInSec)
     end
 end
 
-function Player:onKeyDown(key)
-    if key == 'space' then
+function Player:onMouseDown(mouseX, mouseY, button)
+    if button == 'l' then
         local playerPhysics = self.engine.models.physics.objects.player
         if playerPhysics then
+            local playerX = playerPhysics.body:getX(),
+            local playerY = playerPhysics.body:getY(),
+
             self.engine:trigger('fire', {
                 damage = self.damage,
-                x = playerPhysics.body:getX(),
-                y = playerPhysics.body:getY(),
+                x = playerX,
+                y = playerY,
+                angle = vector.angleTo(playerX, playerY, mouseX, mouseY)
                 category = G.COLLISION.PLAYER_BULLET,
             })
         end

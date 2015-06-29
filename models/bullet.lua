@@ -15,8 +15,7 @@ function Bullet:onFire(bulletSpec)
     local bullet = {
         x = bulletSpec.x,
         y = bulletSpec.y,
-        dx = bulletSpec.dx,
-        dy = bulletSpec.dy,
+        angle = bulletSpec.angle,
         timeout = 3,
         damage = bulletSpec.damage,
         category = bulletSpec.category,
