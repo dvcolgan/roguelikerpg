@@ -5,6 +5,7 @@ local Engine = require('lib/eventengine')
 function love.load()
     engine = Engine:new()
     engine:addImage('gear', love.graphics.newImage('assets/gear.png'))
+    engine:addImage('crosshairs', love.graphics.newImage('assets/crosshairs.png'))
     engine:addImage('tilesheet', love.graphics.newImage('assets/tilesheet.png'))
     engine:addImage('tilesheetSmall', love.graphics.newImage('assets/tilesheet-small.png'))
     engine:addModels({

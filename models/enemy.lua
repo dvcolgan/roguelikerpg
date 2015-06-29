@@ -39,33 +39,31 @@ end
 
 
 function Enemy:onUpdate(dtInSec)
-    local enemiesPhysics = self.engine.models.physics.objects.enemies
-    if enemiesPhysics then
-        for uuid, enemy in pairs(self.enemies) do
-            local enemyPhysics = enemiesPhysics[uuid]
-            enemy.shotTime = enemy.shotTime + dtInSec
-            if enemy.shotTime >= enemy.fireRate then
-                local playerPhysics = self.engine.models.physics.objects.player
-                local targetX = playerPhysics.body:getX()
-                local targetY = playerPhysics.body:getY()
-                local startX = enemyPhysics.body:getX()
-                local startY = enemyPhysics.body:getY()
+    local player = self.engine.models.player
+    local playerPhysics = self.engine.models.physics.objects[player.uuid]
 
-                local dx, dy = vector.normalize(
-                    targetX - startX,
-                    targetY - startY
-                )
+    for uuid, enemy in pairs(self.enemies) do
+        local enemyPhysics = self.engine.models.physics.objects[uuid]
+        enemy.shotTime = enemy.shotTime + dtInSec
+        if enemy.shotTime >= enemy.fireRate then
+            local targetX = playerPhysics.body:getX()
+            local targetY = playerPhysics.body:getY()
+            local startX = enemyPhysics.body:getX()
+            local startY = enemyPhysics.body:getY()
 
-                self.engine:trigger('fire', {
-                    damage = enemy.damage,
-                    x = startX,
-                    y = startY,
-                    dx = dx,
-                    dy = dy,
-                    category = G.COLLISION.ENEMY_BULLET,
-                })
-                enemy.shotTime = 0
-            end
+            local angle = math.atan2(
+                targetY - startY,
+                targetX - startX
+            )
+
+            self.engine:trigger('fire', {
+                damage = enemy.damage,
+                x = startX,
+                y = startY,
+                angle = angle,
+                category = G.COLLISION.ENEMY_BULLET,
+            })
+            enemy.shotTime = 0
         end
     end
 end

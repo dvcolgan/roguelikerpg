@@ -41,6 +41,7 @@ function OverworldState:create()
     love.graphics.setBackgroundColor(255, 255, 255)
     love.graphics.setNewFont(18)
     self.engine:trigger('roomChange', 0, 0)
+    love.mouse.setVisible(false)
 end
 
 function OverworldState:draw()
@@ -51,6 +52,7 @@ function OverworldState:draw()
     self:drawNPCs()
     self:drawEnemies()
     self:drawBullets()
+    self:drawCrosshairs()
     self:drawDialog()
     self:drawMinimap()
     self:drawEditor()
@@ -87,19 +89,32 @@ function OverworldState:drawNPCs()
 end
 
 function OverworldState:drawEnemies()
-    local enemies = self.engine.models.physics.objects.enemies
+    local enemies = self.engine.models.enemy.enemies
     if enemies then
-        for _, enemy in pairs(enemies) do
-            love.graphics.setColor(255, 0, 0, 255)
-            love.graphics.circle(
-                'fill',
-                enemy.body:getX(),
-                enemy.body:getY(),
-                enemy.shape:getRadius(),
-                16
-            )
+        for uuid, enemy in pairs(enemies) do
+            local enemyPhysics = self.engine.models.physics.objects[uuid]
+            if enemyPhysics then
+                love.graphics.setColor(255, 0, 0, 255)
+                love.graphics.circle(
+                    'fill',
+                    enemyPhysics.body:getX(),
+                    enemyPhysics.body:getY(),
+                    enemyPhysics.shape:getRadius(),
+                    16
+                )
+            end
         end
     end
+end
+
+function OverworldState:drawCrosshairs()
+    local image = self.engine.images.crosshairs
+    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.draw(
+        image,
+        love.mouse.getX() - image:getWidth() / 2,
+        love.mouse.getY() - image:getHeight() / 2
+    )
 end
 
 function OverworldState:drawDialog()
@@ -139,29 +154,32 @@ function OverworldState:drawDialog()
 end
 
 function OverworldState:drawPlayer()
-    local player = self.engine.models.physics.objects.player
-    if player then
+    local player = self.engine.models.player
+    local playerPhysics = self.engine.models.physics.objects[player.uuid]
+    if playerPhysics then
         love.graphics.setColor(0, 0, 0, 255)
         love.graphics.circle(
             'fill',
-            player.body:getX(),
-            player.body:getY(),
-            player.shape:getRadius(),
+            playerPhysics.body:getX(),
+            playerPhysics.body:getY(),
+            playerPhysics.shape:getRadius(),
             16
         )
     end
 end
 
 function OverworldState:drawBullets()
-    local bullets = self.engine.models.physics.objects.bullets
-    if bullets then
-        for uuid, bullet in pairs(bullets) do
+    local bullets = self.engine.models.bullet.bullets
+    local objects = self.engine.models.physics.objects
+    for uuid, bullet in pairs(bullets) do
+        local bulletPhysics = objects[uuid]
+        if bulletPhysics then
             love.graphics.setColor(50, 50, 50, 255)
             love.graphics.circle(
                 'fill',
-                bullet.body:getX(),
-                bullet.body:getY(),
-                bullet.shape:getRadius(),
+                bulletPhysics.body:getX(),
+                bulletPhysics.body:getY(),
+                bulletPhysics.shape:getRadius(),
                 16
             )
         end

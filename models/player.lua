@@ -1,12 +1,14 @@
 local class = require('middleclass')
 local G = require('constants')
 local vector = require('vector')
+local util = require('util')
 
 
 local Player = class('Player')
 
 function Player:initialize(engine)
     self.engine = engine
+    self.uuid = util.uuid()
     self.lastX = 0
     self.lastY = 0
     self.direction = 'left'
@@ -27,7 +29,7 @@ function Player:onGiveBackControls()
 end
 
 function Player:onUpdate(dtInSec)
-    local playerPhysics = self.engine.models.physics.objects.player
+    local playerPhysics = self.engine.models.physics.objects[self.uuid]
     if playerPhysics then
         self.lastX = playerPhysics.body:getX()
         self.lastY = playerPhysics.body:getY()
@@ -36,16 +38,22 @@ end
 
 function Player:onMouseDown(mouseX, mouseY, button)
     if button == 'l' then
-        local playerPhysics = self.engine.models.physics.objects.player
+        local playerPhysics = self.engine.models.physics.objects[self.uuid]
         if playerPhysics then
-            local playerX = playerPhysics.body:getX(),
-            local playerY = playerPhysics.body:getY(),
+            local playerX = playerPhysics.body:getX()
+            local playerY = playerPhysics.body:getY()
+            local angle = math.atan2(
+                mouseY - playerY,
+                mouseX - playerX
+            )
+            print(playerX, playerY, mouseX, mouseY)
+            print(angle)
 
             self.engine:trigger('fire', {
                 damage = self.damage,
                 x = playerX,
                 y = playerY,
-                angle = vector.angleTo(playerX, playerY, mouseX, mouseY)
+                angle = angle,
                 category = G.COLLISION.PLAYER_BULLET,
             })
         end

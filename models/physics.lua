@@ -1,6 +1,7 @@
 local class = require('middleclass')
 local G = require('constants')
 local MarchingSquares = require('lib/marchingsquares')
+local util = require('util')
 
 
 local Physics = class('Physics')
@@ -28,7 +29,6 @@ function Physics:onEnemiesLoaded()
     local map = self.engine.models.map
     self.vertexGroups = MarchingSquares:new(map.currentRoom.collision):findMapBoxVertexGroups()
 
-    self.objects.map = {}
     for i, vertexGroup in ipairs(self.vertexGroups) do
         local object = {}
         local centerX = (vertexGroup.topLeft.x + vertexGroup.topRight.x) / 2
@@ -36,11 +36,12 @@ function Physics:onEnemiesLoaded()
         local width = vertexGroup.topRight.x - vertexGroup.topLeft.x
         local height = vertexGroup.bottomLeft.y - vertexGroup.topLeft.y
  
+        object.uuid = util.uuid()
         object.body = love.physics.newBody(self.world, centerX, centerY)
         object.shape = love.physics.newRectangleShape(width, height)
         object.fixture = love.physics.newFixture(object.body, object.shape)
         object.fixture:setCategory(G.COLLISION.WALL)
-        table.insert(self.objects.map, object)
+        self.objects[object.uuid] = object
     end
 
     local enemiesPhysics = {}
@@ -56,9 +57,8 @@ function Physics:onEnemiesLoaded()
         enemyPhysics.fixture:setCategory(G.COLLISION.ENEMY)
         enemyPhysics.fixture:setMask(G.COLLISION.ENEMY, G.COLLISION.ENEMY_BULLET)
         enemyPhysics.fixture:setRestitution(0.2)
-        enemiesPhysics[uuid] = enemyPhysics
+        self.objects[uuid] = enemyPhysics
     end
-    self.objects.enemies = enemiesPhysics
 
     local playerPhysics = {}
     local player = self.engine.models.player
@@ -92,10 +92,7 @@ function Physics:onEnemiesLoaded()
     playerPhysics.fixture:setRestitution(0.2)
     playerPhysics.fixture:setCategory(G.COLLISION.PLAYER)
     playerPhysics.fixture:setMask(G.COLLISION.PLAYER, G.COLLISION.PLAYER_BULLET)
-    self.objects.player = playerPhysics
-
-    self.objects.bullets = {}
-    self.objects.gears = {}
+    self.objects[player.uuid] = playerPhysics
 end
 
 function Physics:onBulletFired(uuid, bullet)
