@@ -46,8 +46,6 @@ function Player:onMouseDown(mouseX, mouseY, button)
                 mouseY - playerY,
                 mouseX - playerX
             )
-            print(playerX, playerY, mouseX, mouseY)
-            print(angle)
 
             self.engine:trigger('fire', {
                 damage = self.damage,

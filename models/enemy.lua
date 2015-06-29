@@ -16,6 +16,18 @@ function Enemy:onRoomChange()
     self.enemies = {}
 end
 
+function Enemy:isEnemy(uuid)
+    return self.enemies[uuid] ~= nil
+end
+
+function Enemy:onEnemyHit(uuid)
+    if self.enemies[uuid] then
+        self.enemies[uuid] = nil
+        self.engine:trigger('enemyRemove', uuid)
+    end
+end
+
+
 function Enemy:onMapLoaded()
     for i, enemy in ipairs(self.engine.models.map.currentRoom.enemies) do
         local enemyTemplate = self.enemyTemplates[enemy.key]

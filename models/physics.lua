@@ -6,12 +6,37 @@ local util = require('util')
 
 local Physics = class('Physics')
 
+
 function Physics:initialize(engine)
     self.engine = engine
     self.vertexGroups = {}
 
     love.physics.setMeter(G.TILE_SIZE)
     self.world = love.physics.newWorld(0, 0, true)
+
+    local that = self
+    function postSolve(a, b, coll)
+        local uuidA = a:getUserData()
+        local uuidB = b:getUserData()
+        local bullet = self.engine.models.bullet
+        local enemy = self.engine.models.enemy
+
+        if bullet:isBullet(uuidA) and enemy:isEnemy(uuidB) then
+            self.engine:trigger('enemyHit', uuidB)
+        end
+        if bullet:isBullet(uuidB) and enemy:isEnemy(uuidA) then
+            self.engine:trigger('enemyHit', uuidA)
+        end
+
+        if bullet:isBullet(uuidA)  then
+            self.engine:trigger('bulletCollided', uuidA)
+        end
+        if bullet:isBullet(uuidB) then
+            self.engine:trigger('bulletCollided', uuidB)
+        end
+    end
+
+    self.world:setCallbacks(nil, nil, nil, postSolve)
     self.objects = {}
     self.paused = false
 end
@@ -36,12 +61,13 @@ function Physics:onEnemiesLoaded()
         local width = vertexGroup.topRight.x - vertexGroup.topLeft.x
         local height = vertexGroup.bottomLeft.y - vertexGroup.topLeft.y
  
-        object.uuid = util.uuid()
+        local uuid = util.uuid()
         object.body = love.physics.newBody(self.world, centerX, centerY)
         object.shape = love.physics.newRectangleShape(width, height)
         object.fixture = love.physics.newFixture(object.body, object.shape)
         object.fixture:setCategory(G.COLLISION.WALL)
-        self.objects[object.uuid] = object
+        object.fixture:setUserData(uuid)
+        self.objects[uuid] = object
     end
 
     local enemiesPhysics = {}
@@ -57,6 +83,7 @@ function Physics:onEnemiesLoaded()
         enemyPhysics.fixture:setCategory(G.COLLISION.ENEMY)
         enemyPhysics.fixture:setMask(G.COLLISION.ENEMY, G.COLLISION.ENEMY_BULLET)
         enemyPhysics.fixture:setRestitution(0.2)
+        enemyPhysics.fixture:setUserData(uuid)
         self.objects[uuid] = enemyPhysics
     end
 
@@ -92,6 +119,7 @@ function Physics:onEnemiesLoaded()
     playerPhysics.fixture:setRestitution(0.2)
     playerPhysics.fixture:setCategory(G.COLLISION.PLAYER)
     playerPhysics.fixture:setMask(G.COLLISION.PLAYER, G.COLLISION.PLAYER_BULLET)
+    playerPhysics.fixture:setUserData(player.uuid)
     self.objects[player.uuid] = playerPhysics
 end
 
@@ -104,6 +132,7 @@ function Physics:onBulletFired(uuid, bullet)
     bulletPhysics.fixture = love.physics.newFixture(bulletPhysics.body, bulletPhysics.shape, 1)
     bulletPhysics.fixture:setRestitution(0.3)
     bulletPhysics.fixture:setCategory(bullet.category)
+    bulletPhysics.fixture:setUserData(uuid)
     if bullet.category == G.COLLISION.PLAYER_BULLET then
         bulletPhysics.fixture:setMask(G.COLLISION.ENEMY_BULLET)
     else
@@ -125,6 +154,7 @@ function Physics:onGearDropped(uuid, gear)
     gearPhysics.fixture = love.physics.newFixture(gearPhysics.body, gearPhysics.shape, 1)
     gearPhysics.fixture:setRestitution(0.3)
     gearPhysics.fixture:setCategory(G.COLLISION.GEAR)
+    gearPhysics.fixture:setUserData(uuid)
     gearPhysics.fixture:setMask(
         G.COLLISION.ENEMY,
         G.COLLISION.PLAYER_BULLET,
@@ -138,7 +168,12 @@ function Physics:onGearDropped(uuid, gear)
     self.objects[uuid] = gearPhysics
 end
 
-function Physics:onBulletTimeout(uuid)
+function Physics:onBulletRemove(uuid)
+    self.objects[uuid].body:destroy()
+    self.objects[uuid] = nil
+end
+
+function Physics:onEnemyRemove(uuid)
     self.objects[uuid].body:destroy()
     self.objects[uuid] = nil
 end

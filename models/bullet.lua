@@ -24,12 +24,23 @@ function Bullet:onFire(bulletSpec)
     self.engine:trigger('bulletFired', uuid, bullet)
 end
 
+function Bullet:isBullet(uuid)
+    return self.bullets[uuid] ~= nil
+end
+
+function Bullet:onBulletCollided(uuid)
+    if self.bullets[uuid] then
+        self.bullets[uuid] = nil
+        self.engine:trigger('bulletRemove', uuid)
+    end
+end
+
 function Bullet:onUpdate(dtInSec)
     for uuid, bullet in pairs(self.bullets) do
         bullet.timeout = bullet.timeout - dtInSec
         if bullet.timeout <= 0 then
             self.bullets[uuid] = nil
-            self.engine:trigger('bulletTimeout', uuid)
+            self.engine:trigger('bulletRemove', uuid)
         end
     end
 end
