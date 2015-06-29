@@ -20,6 +20,8 @@ function Physics:initialize(engine)
         local uuidB = b:getUserData()
         local bullet = self.engine.models.bullet
         local enemy = self.engine.models.enemy
+        local gear = self.engine.models.gear
+        local player = self.engine.models.player
 
         if bullet:isBullet(uuidA) and enemy:isEnemy(uuidB) then
             self.engine:trigger('enemyHit', uuidB)
@@ -33,6 +35,13 @@ function Physics:initialize(engine)
         end
         if bullet:isBullet(uuidB) then
             self.engine:trigger('bulletCollided', uuidB)
+        end
+
+        if gear:isGear(uuidA) and player:isPlayer(uuidB) then
+            self.engine:trigger('collectGear', uuidA)
+        end
+        if gear:isGear(uuidB) and player:isPlayer(uuidA) then
+            self.engine:trigger('collectGear', uuidB)
         end
     end
 
@@ -169,13 +178,24 @@ function Physics:onGearDropped(uuid, gear)
 end
 
 function Physics:onBulletRemove(uuid)
-    self.objects[uuid].body:destroy()
-    self.objects[uuid] = nil
+    if self.objects[uuid] then
+        self.objects[uuid].body:destroy()
+        self.objects[uuid] = nil
+    end
 end
 
 function Physics:onEnemyRemove(uuid)
-    self.objects[uuid].body:destroy()
-    self.objects[uuid] = nil
+    if self.objects[uuid] then
+        self.objects[uuid].body:destroy()
+        self.objects[uuid] = nil
+    end
+end
+
+function Physics:onGearRemove(uuid)
+    if self.objects[uuid] then
+        self.objects[uuid].body:destroy()
+        self.objects[uuid] = nil
+    end
 end
 
 function Physics:onUpdate(dtInSec)

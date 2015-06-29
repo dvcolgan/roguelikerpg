@@ -36,6 +36,14 @@ function Player:onUpdate(dtInSec)
     end
 end
 
+function Player:isPlayer(uuid)
+    return self.uuid == uuid
+end
+
+function Player:onCollectGear(uuid)
+    self.gears = self.gears + 1
+end
+
 function Player:onMouseDown(mouseX, mouseY, button)
     if button == 'l' then
         local playerPhysics = self.engine.models.physics.objects[self.uuid]

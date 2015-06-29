@@ -49,7 +49,7 @@ Features:
 
 
     combat:
-        use the mouse to aim, click to fire
+        make gears have friction
 
         Backstory:
             You are a prisoner on a prison ship, and you have just realized
@@ -84,10 +84,7 @@ Features:
         cutscenes happen as you enter rooms and don't take away your controls
         or cutscenes don't increment the timer?
 
-
-        make bullets disappear when then hit something that is damaged by them
         use items from the inventory
-        shoot in directions
         make enemies drop a gear every time a certain amount of damage threshold has passed
             enemy has 10 hp and drops 5 gears total, every 2 hp you do the enemy drops a gear
 

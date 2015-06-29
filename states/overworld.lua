@@ -53,6 +53,7 @@ function OverworldState:draw()
     self:drawEnemies()
     self:drawBullets()
     self:drawCrosshairs()
+    self:drawHUD()
     self:drawDialog()
     self:drawMinimap()
     self:drawEditor()
@@ -60,18 +61,21 @@ function OverworldState:draw()
 end
 
 function OverworldState:drawGears()
-    local gears = self.engine.models.physics.objects.gears
+    local gears = self.engine.models.gear.gears
     local sprite = self.engine.images.gear
     if gears then
         for uuid, gear in pairs(gears) do
-            love.graphics.draw(sprite,
-                gear.body:getX(),
-                gear.body:getY(),
-                gear.body:getAngle(),
-                1, 1,
-                G.GEAR_SIZE / 2,
-                G.GEAR_SIZE / 2
-            )
+            local gearPhysics = self.engine.models.physics.objects[uuid]
+            if gearPhysics then
+                love.graphics.draw(sprite,
+                    gearPhysics.body:getX(),
+                    gearPhysics.body:getY(),
+                    gearPhysics.body:getAngle(),
+                    1, 1,
+                    G.GEAR_SIZE / 2,
+                    G.GEAR_SIZE / 2
+                )
+            end
         end
     end
 end
@@ -114,6 +118,14 @@ function OverworldState:drawCrosshairs()
         image,
         love.mouse.getX() - image:getWidth() / 2,
         love.mouse.getY() - image:getHeight() / 2
+    )
+end
+
+function OverworldState:drawHUD()
+    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.print(
+        'Gears: ' .. tostring(self.engine.models.player.gears),
+        20, 20
     )
 end
 

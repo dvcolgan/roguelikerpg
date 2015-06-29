@@ -21,14 +21,17 @@ function Gear:onSpawnGear(x, y, amount)
     end
 end
 
-function Gear:onRoomChange()
-    self.bullets = {}
+function Gear:onCollectGear(uuid)
+    self.gears[uuid] = nil
+    self.engine:trigger('gearRemove', uuid)
 end
 
-function Gear:onKeyDown(key)
-    if key == 'g' then
-        self.engine:trigger('spawnGear', 200, 400, 5)
-    end
+function Gear:isGear(uuid)
+    return self.gears[uuid] ~= nil
+end
+
+function Gear:onRoomChange()
+    self.bullets = {}
 end
 
 return Gear

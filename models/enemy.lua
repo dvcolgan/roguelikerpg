@@ -22,6 +22,15 @@ end
 
 function Enemy:onEnemyHit(uuid)
     if self.enemies[uuid] then
+
+        local enemyPhysics = self.engine.models.physics.objects[uuid]
+        self.engine:trigger(
+            'spawnGear',
+            enemyPhysics.body:getX(),
+            enemyPhysics.body:getY(),
+            5
+        )
+
         self.enemies[uuid] = nil
         self.engine:trigger('enemyRemove', uuid)
     end
