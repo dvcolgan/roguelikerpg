@@ -1,3 +1,35 @@
+
+The room and the characters do not change between loads
+Room
+    uuid = string
+
+
+Character/Mob (Player, Enemy, NPC)
+    uuid = string
+    room = room
+    physics = physics
+    hp = integer
+    energy = integer
+    gears = integer
+    items = []
+    brain = class for determining how it is controlled
+
+Bullets are wiped between room loads, or are persisted
+Bullet
+    uuid = string
+    room = pointer to room
+
+The physics changes between room loads
+Physics
+    uuid
+    body
+    shape
+    fixture
+
+
+
+
+
 Data for the game
 
 Static data that is stored in files that is the same between runs
@@ -6,21 +38,6 @@ Dynamic data that is stored for a single run
 
 Dynamic data that is stored for the current room
 
-bullet
-enemy
-gun
-key
-physics
-dialog
-flag
-inventory
-map
-player
-editor
-gear
-item
-npc
-room
 
 
 

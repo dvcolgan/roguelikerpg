@@ -204,18 +204,20 @@ function OverworldState:drawTileMap()
     local map = self.engine.models.map
 
     love.graphics.setColor(255, 255, 255, 255)
-    for layer = 1, #map.currentRoom.layers do
-        for row = 1, G.ROOM_HEIGHT do
-            for col = 1, G.ROOM_WIDTH do
-                local tile = map:tileAt(col, row, layer)
-                if tile ~= nil then
-                    if tile > 0 then
-                        love.graphics.draw(
-                            tilesheet,
-                            map.quads[tile],
-                            math.floor((col-1) * G.TILE_SIZE),
-                            math.floor((row-1) * G.TILE_SIZE)
-                        ) 
+    if map.currentRoom then
+        for layer = 1, #map.currentRoom.layers do
+            for row = 1, G.ROOM_HEIGHT do
+                for col = 1, G.ROOM_WIDTH do
+                    local tile = map:tileAt(col, row, layer)
+                    if tile ~= nil then
+                        if tile > 0 then
+                            love.graphics.draw(
+                                tilesheet,
+                                map.quads[tile],
+                                math.floor((col-1) * G.TILE_SIZE),
+                                math.floor((row-1) * G.TILE_SIZE)
+                            ) 
+                        end
                     end
                 end
             end

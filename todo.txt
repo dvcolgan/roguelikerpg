@@ -25,7 +25,9 @@ cooling - the higher the cooling the more it cools
 attributes:
     piercing - goes through enemies
     spectral - goes through obstacles
-    bouncy - bounces off walls
+    bouncy - bounces off wbullet.lua     enemy.lua      gun.lua        key.lua        physics.lua
+dialog.lua     flag.lua       inventory.lua  map.lua        player.lua
+editor.lua     gear.lua       item.lua       npc.lua        room.luaalls
     laser - shoots a laser instead of a musketball
     exploding - explodes on impact
     remote detonators

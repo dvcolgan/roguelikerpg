@@ -11,13 +11,7 @@ function Map:initialize(engine)
     self.worldTemplate = require('scenarios/prisonship/world')
     self.roomTemplates = require('scenarios/prisonship/rooms')
     self.thisRunsRooms = {}
-
-    self.currentRoom = {
-        layers = {},
-        collision = {},
-        enemies = {},
-        items = {},
-    }
+    self.currentRoom = nil
 
     self.currentCol = self.worldTemplate.start.col
     self.currentRow = self.worldTemplate.start.row
@@ -74,8 +68,9 @@ function Map:generateThisRunsRooms()
                 local roomType = self.worldTemplate.roomTypes[char]
                 if roomType ~= nil then
                     roomType = 'deck'
-                    floor[key], index = self:chooseRandomRoom(roomType)
-                    floor[key].index = index
+                    local room, index = self:chooseRandomRoom(roomType)
+                    room.index = index
+                    floor[key] = room
                 end
                 i = i + 1
             end
@@ -98,12 +93,8 @@ end
 
 
 function Map:onRoomNeeded(floor, key)
-    local roomData = self.thisRunsRooms[floor][key]
-    self.currentRoom.layers = roomData.layers
-    self.currentRoom.collision = roomData.collision
-    self.currentRoom.enemies = roomData.enemies
-    self.currentRoom.items = roomData.items
-    roomData.script(self.engine)
+    self.currentRoom = self.thisRunsRooms[floor][key]
+    self.currentRoom.script(self.engine)
     self.engine:trigger('mapLoaded')
 end
 
