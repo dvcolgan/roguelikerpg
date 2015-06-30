@@ -1,3 +1,29 @@
+Data for the game
+
+Static data that is stored in files that is the same between runs
+
+Dynamic data that is stored for a single run
+
+Dynamic data that is stored for the current room
+
+bullet
+enemy
+gun
+key
+physics
+dialog
+flag
+inventory
+map
+player
+editor
+gear
+item
+npc
+room
+
+
+
 tile system
 
 camera

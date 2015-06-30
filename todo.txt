@@ -1,3 +1,99 @@
+starts you with random items and in a random location on the ship at the beginning of the run
+
+vents to connect foors
+
+different areas of the ship are more unlocked if you get keys from things
+enemies are made up of random parts
+they always drop gears, and have a random chance of dropping something larger that they were carrying
+randomize bosses
+
+implement momentum and knockback
+
+you can take off any item at any time, even going without any items to be at base stats
+
+objects in the map
+
+id
+name - the name of the thing
+armor - how hard enemies hit you
+weight - slows you down the more weight there is
+shotMass - how big the bullet is and its hitbox
+shotForce - how much force is used when firing
+mount - where on the guy the thing goes
+cooling - the higher the cooling the more it cools
+
+attributes:
+    piercing - goes through enemies
+    spectral - goes through obstacles
+    bouncy - bounces off walls
+    laser - shoots a laser instead of a musketball
+    exploding - explodes on impact
+    remote detonators
+    homing - follows enemies
+    boomerange
+    freezing
+    fear shot
+    shots increase in size as they go
+    poison
+    cluster
+    paralysis
+    charm/confusion (make enemies attack each other)
+    orbiting shots
+    slowing shots
+    silence (no special abilities)
+    fear - weaker and less armor
+    bullet time
+    psi
+    blindness
+    emp storm
+    shockwave
+    nuke
+
+
+explode radius
+
+what determines heat:
+    moving increases it slightly
+    shooting increases based on force
+
+    Resistance - Jecat2
+    Battle of the Lost - Rnm161
+
+a set number of health
+an energy level that powers weapons and shields?
+if shield at zero take health damage
+
+speed - determined by weight and powerups
+energy - find energy tanks throughout the run
+health - can be upgraded
+cooling - how fast your heat goes down
+if you get too hot you explode
+
+you can hold on to items without activating them
+
+trade items with other people
+the ship is sinking to give a feel of urgency
+
+--[[
+--all you have to do is decide what to equip,
+--and the game will arrange the items
+--in a suitable fashion
+--power headband - add small amounts of defense
+--arm cannon
+--speed boots
+--cooling fans
+]]--
+
+after certain amounts of time, the ship explodes a little more and parts are impassable or more dangerous
+
+All items improve your power in some way, but add weight
+The more weight you have the slower you go
+At the beginning you are at top speed, the more items you add you get slower
+
+
+
+
+
 Features:
     inventory:
         add throwing stars that rotate offcenter
