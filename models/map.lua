@@ -70,13 +70,28 @@ function Map:generateThisRunsRooms()
                     local roomTemplate, index = self:chooseRandomRoom(roomType)
                     local room = _.clone(roomTemplate)
                     room.index = index
+                    self.thisRunsRoomTemplates[key] = room
                 end
                 i = i + 1
-                self.thisRunsRoomTemplates[key] = floor
             end
         end
     end
     return self.thisRunsRoomTemplates
+end
+
+function Map:activateRoom(col, row, floor)
+    self.lastCol = col
+    self.lastRow = row
+    self.lastFloor = floor
+    self.currentCol = col
+    self.currentRow = row
+    self.currentFloor = floor
+    local key = tostring(col) .. 'x' .. tostring(row) .. 'x' .. tostring(floor)
+    if self.thisRunsRoomTemplates[key] then
+        self.currentRoom = self.thisRunsRoomTemplates[key]
+        --self.currentRoom.script(Engine)
+    end
+    return key
 end
 
 function Map:transitionBy(dCol, dRow, dFloor, Engine)
@@ -86,14 +101,12 @@ function Map:transitionBy(dCol, dRow, dFloor, Engine)
     self.currentCol = self.currentCol + dCol
     self.currentRow = self.currentRow + dRow
     self.currentFloor = self.currentFloor + dFloor
-    local key = tostring(self.currentCol) .. 'x' .. tostring(self.currentRow)
-    if self.thisRunsRoomTemplates[self.currentFloor][key] then
-        self.currentRoom = self.thisRunsRoomTemplates[self.currentFloor][key]
-
-        currentRoom.enemies
-
+    local key = tostring(self.currentCol) .. 'x' .. tostring(self.currentRow) .. 'x' .. tostring(self.currentFloor)
+    if self.thisRunsRoomTemplates[key] then
+        self.currentRoom = self.thisRunsRoomTemplates[key]
         --self.currentRoom.script(Engine)
     end
+    return key
 end
 
 function Map:tileAt(col, row, layer)

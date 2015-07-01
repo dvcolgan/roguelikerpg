@@ -27,7 +27,7 @@ function GameState:onUpdate(dtInSec)
 
     Player:syncLastCoordinates(playerPhysics)
 
-    for enemyUuid, enemy in pairs(Enemy.enemies) do
+    for enemyUuid, enemy in pairs(Enemy.currentEnemySet) do
         local enemyPhysics = Physics:get(enemyUuid)
         if enemyPhysics then
             local bulletSpec = Enemy:tryFire(
@@ -119,21 +119,17 @@ function GameState:onKeyUp(key)
 end
 
 function GameState:onRoomChange(dCol, dRow, dFloor)
-    Bullet:clear()
-    Dialog:reset()
-    Enemy:clear()
-    Gear:clear()
-    Physics:clear()
-
-    -- Set up the nonphysics data for this room
-    Map:transitionBy(dCol, dRow, dFloor, Engine)
-    Enemy:buildEnemies(Map.currentRoom.enemies)
-
-    -- Based on that build the physics objects
-    Physics:buildRoom(Map.currentRoom.collision)
-    Physics:buildEnemies(Enemy.enemies)
-    Physics:buildPlayer(Player.player, Map)
+    local key = Map:transitionBy(dCol, dRow, dFloor, Engine)
+    Enemy:activateRoom(key)
+    Physics:activateRoom(key)
+    Physics:positionPlayerOnRoomEnter(
+        key,
+        Player.player,
+        Physics:get(Player.player.uuid),
+        Map
+    )
 end
+
 
 function GameState:draw()
     love.graphics.clear()
@@ -188,7 +184,7 @@ function GameState:drawNPCs()
 end
 
 function GameState:drawEnemies()
-    for uuid, enemy in pairs(Enemy.enemies) do
+    for uuid, enemy in pairs(Enemy.currentEnemySet) do
         local enemyPhysics = Physics:get(uuid)
         if enemyPhysics then
             love.graphics.setColor(255, 0, 0, 255)
@@ -446,7 +442,7 @@ function GameState:drawMinimap()
     local padding = 4
     love.graphics.setLineWidth(2)
 
-    local rooms = Map.thisRunsRooms[Map.currentFloor]
+    local rooms = Map.thisRunsRoomTemplates[Map.currentFloor]
     if rooms then
         for row = 1, G.ROOM_HEIGHT do
             for col = 1, G.ROOM_WIDTH do
@@ -483,27 +479,30 @@ function GameState:drawMinimap()
     end
 end
 
+function physicsPostSolve(a, b, coll)
+    Engine:trigger('physicsPostSolve', a, b, coll)
+end
+
 love.graphics.setBackgroundColor(255, 255, 255)
 love.graphics.setNewFont(18)
 love.mouse.setVisible(false)
-
-Physics.world:setCallbacks(nil, nil, nil, function(a, b, coll)
-    Engine:trigger('physicsPostSolve', a, b, coll)
-end)
-
 Map:parseTileset(Asset.images.tilesheet)
+
 for key, roomTemplate in pairs(Map:generateThisRunsRooms()) do
     Physics:initializeRoom(key)
+    Physics.worlds[key]:setCallbacks(nil, nil, nil, physicsPostSolve)
+
     Physics:buildRoom(key, roomTemplate.collision)
 
-    for i, enemyTemplate in ipairs(roomTemplate.enemies) do
+    for i, enemyData in ipairs(roomTemplate.enemies) do
         Enemy:initializeRoom(key)
-        local enemy = Enemy:build(key, enemyTemplate)
-        Physics:buildEnemies(key, enemy)
+        local enemy = Enemy:build(key, enemyData)
+        Physics:buildEnemy(key, enemy)
+    end
 
     Physics:buildPlayer(key, Player.player)
 end
-
+Map:activateRoom(5, 3, 3)
 Engine:trigger('roomChange', 0, 0, 0)
 
 return GameState

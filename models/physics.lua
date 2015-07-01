@@ -17,11 +17,10 @@ Physics.currentVertexGroups = nil
 Physics.paused = false
 
 
-function Physics:activateRoom(col, row)
-    local key = tostring(col) .. 'x' .. tostring(row)
+function Physics:activateRoom(key)
     Physics.currentWorld = Physics.worlds[key]
     Physics.currentObjects = Physics.objectSets[key]
-    Physics.currentVertexGroups = Physics.currentVertexGroups[key]
+    Physics.currentVertexGroups = Physics.vertexGroupSets[key]
 end
 
 function Physics:initializeRoom(key)
@@ -34,9 +33,9 @@ function Physics:buildRoom(key, mapCollision)
     local objects = self.objectSets[key]
     local world = self.worlds[key]
     self.vertexGroupSets[key] = MarchingSquares:new(mapCollision):findMapBoxVertexGroups()
-    local vertexGroups = self.vertexGroups[key]
+    local vertexGroups = self.vertexGroupSets[key]
 
-    for i, vertexGroup in ipairs(vertexGroup) do
+    for i, vertexGroup in ipairs(vertexGroups) do
         local object = {}
         local centerX = (vertexGroup.topLeft.x + vertexGroup.topRight.x) / 2
         local centerY = (vertexGroup.topLeft.y + vertexGroup.bottomLeft.y) / 2
@@ -53,24 +52,22 @@ function Physics:buildRoom(key, mapCollision)
     end
 end
 
-function Physics:buildEnemies(key, enemies)
+function Physics:buildEnemy(key, enemy)
     local objects = self.objectSets[key]
     local world = self.worlds[key]
 
-    for uuid, enemy in pairs(enemies) do
-        local enemyPhysics = {}
-        enemyPhysics.body = love.physics.newBody(world, enemy.x, enemy.y, 'dynamic')
-        enemyPhysics.body:setLinearDamping(10)
-        enemyPhysics.body:setX(enemy.x)
-        enemyPhysics.body:setY(enemy.y)
-        enemyPhysics.shape = love.physics.newCircleShape(enemy.radius)
-        enemyPhysics.fixture = love.physics.newFixture(enemyPhysics.body, enemyPhysics.shape, 1)
-        enemyPhysics.fixture:setCategory(G.COLLISION.ENEMY)
-        enemyPhysics.fixture:setMask(G.COLLISION.ENEMY, G.COLLISION.ENEMY_BULLET)
-        enemyPhysics.fixture:setRestitution(0.2)
-        enemyPhysics.fixture:setUserData(uuid)
-        objects[uuid] = enemyPhysics
-    end
+    local enemyPhysics = {}
+    enemyPhysics.body = love.physics.newBody(world, enemy.x, enemy.y, 'dynamic')
+    enemyPhysics.body:setLinearDamping(10)
+    enemyPhysics.body:setX(enemy.x)
+    enemyPhysics.body:setY(enemy.y)
+    enemyPhysics.shape = love.physics.newCircleShape(enemy.radius)
+    enemyPhysics.fixture = love.physics.newFixture(enemyPhysics.body, enemyPhysics.shape, 1)
+    enemyPhysics.fixture:setCategory(G.COLLISION.ENEMY)
+    enemyPhysics.fixture:setMask(G.COLLISION.ENEMY, G.COLLISION.ENEMY_BULLET)
+    enemyPhysics.fixture:setRestitution(0.2)
+    enemyPhysics.fixture:setUserData(uuid)
+    objects[enemy.uuid] = enemyPhysics
 end
 
 function Physics:buildPlayer(key, player)
@@ -90,7 +87,7 @@ function Physics:buildPlayer(key, player)
     objects[player.uuid] = playerPhysics
 end
 
-function Physics:positionPlayerOnRoomEnter()
+function Physics:positionPlayerOnRoomEnter(key, player, playerPhysics, map)
     if map.currentRow < map.lastRow then
         -- went up
         playerPhysics.body:setX(player.lastX)
