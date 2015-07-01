@@ -4,28 +4,7 @@ local Engine = require('lib/eventengine')
 
 function love.load()
     engine = Engine:new()
-    engine:addImage('gear', love.graphics.newImage('assets/gear.png'))
-    engine:addImage('crosshairs', love.graphics.newImage('assets/crosshairs.png'))
-    engine:addImage('tilesheet', love.graphics.newImage('assets/tilesheet.png'))
-    engine:addImage('tilesheetSmall', love.graphics.newImage('assets/tilesheet-small.png'))
-    engine:addModels({
-        player = require('models/player'),
-        key = require('models/key'),
-        bullet = require('models/bullet'),
-        map = require('models/map'),
-        npc = require('models/npc'),
-        dialog = require('models/dialog'),
-        physics = require('models/physics'),
-        flag = require('models/flag'),
-        enemy = require('models/enemy'),
-        editor = require('models/editor'),
-        gear = require('models/gear'),
-    })
-    engine:addStates({
-        --title=require('states/title'),
-        overworld=require('states/overworld'),
-    })
-    engine:setState('overworld', {doUpdate=true, doDraw=true})
+    engine:addStates(require('states/game'))
 end
 
 function love.draw()

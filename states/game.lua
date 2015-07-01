@@ -1,50 +1,100 @@
 local class = require('middleclass')
+local util = require('util')
 local GameState = require('lib/state')
 local G = require('constants')
 
+local Bullet = require('models/bullet')
+local Dialog = require('models/dialog')
+local Enemy = require('models/enemy')
+local Player = require('models/player')
+local Gear = require('models/gear')
+local Physics = require('models/physics')
+local Asset = require('models/asset')
 
-local OverworldState = class('OverworldState', GameState)
 
+local GameState = class('GameState', GameState)
 
-function love.graphics.roundrect(mode, x, y, width, height, xround, yround)
-	local points = {}
-	local precision = (xround + yround) * .1
-	local tI, hP = table.insert, .5*math.pi
-	if xround > width*.5 then xround = width*.5 end
-	if yround > height*.5 then yround = height*.5 end
-	local X1, Y1, X2, Y2 = x + xround, y + yround, x + width - xround, y + height - yround
-	local sin, cos = math.sin, math.cos
-	for i = 0, precision do
-		local a = (i/precision-1)*hP
-		tI(points, X2 + xround*cos(a))
-		tI(points, Y1 + yround*sin(a))
-	end
-	for i = 0, precision do
-		local a = (i/precision)*hP
-		tI(points, X2 + xround*cos(a))
-		tI(points, Y2 + yround*sin(a))
-	end
-	for i = 0, precision do
-		local a = (i/precision+1)*hP
-		tI(points, X1 + xround*cos(a))
-		tI(points, Y2 + yround*sin(a))
-	end
-	for i = 0, precision do
-		local a = (i/precision+2)*hP
-		tI(points, X1 + xround*cos(a))
-		tI(points, Y1 + yround*sin(a))
-	end
-	love.graphics.polygon(mode, unpack(points))
-end
-
-function OverworldState:create()
+function GameState:create()
     love.graphics.setBackgroundColor(255, 255, 255)
     love.graphics.setNewFont(18)
     self.engine:trigger('roomChange', 0, 0)
     love.mouse.setVisible(false)
+    Physics.world:setCallbacks(nil, nil, nil, self.physicsPostSolve)
 end
 
-function OverworldState:draw()
+function GameState:update(dtInSec)
+    Player:syncLastCoordinates()
+    Enemy:update(dtInSec)
+    Physics:update(dtInSec)
+end
+
+function GameState:physicsPostSolve(a, b, coll)
+    local uuidA = a:getUserData()
+    local uuidB = b:getUserData()
+    local enemyUuid = nil
+    local playerUuid = nil
+    local gearUuid = nil
+    local bulletUuid = nil
+
+    -- Determine the nature of the collision participants
+    if Bullet:isBullet(uuidA) then bulletUuid = uuidA end
+    if Bullet:isBullet(uuidB) then bulletUuid = uuidB end
+    if Enemy:isEnemy(uuidA) then enemyUuid = uuidA end
+    if Enemy:isEnemy(uuidB) then enemyUuid = uuidB end
+    if Gear:isGear(uuidA) then gearUuid = uuidA end
+    if Gear:isGear(uuidB) then gearUuid = uuidB end
+    if Player:isPlayer(uuidA) then playerUuid = uuidA end
+    if Player:isPlayer(uuidB) then playerUuid = uuidB end
+
+    if bulletUuid and enemyUuid then
+        -- bullet hit enemy
+        local enemyPhysics = Physics:get(enemyUuid)
+        local gear = Gear:spawn(
+            enemyPhysics.body:getX(),
+            enemyPhysics.body:getY(),
+            5
+        )
+        Physics:buildGear(gear)
+        Enemy:remove(enemyUuid)
+        Physics:remove(enemyUuid)
+
+    elseif bulletUuid  then
+        -- bullet hit wall
+        self.engine:trigger('bulletCollided', uuidA)
+
+    elseif gearUuid and playerUuid then
+        -- player hit gear
+        self.engine:trigger('collectGear', uuidA)
+        Gear:remove(gearUuid)
+        Physics:remove(gearUuid)
+        Player:collectGears(1)
+    end
+end
+
+function GameState:onMouseDown(mouseX, mouseY, button)
+    if button == 'l' then
+        local bullet = Player:createBullet(
+            Physics:get(Player.player.uuid),
+            mouseX,
+            mouseY
+        )
+        local Bullet:fire(bullet)
+    end
+end
+
+function GameState:onRoomChange(dx, dy)
+    Bullet:clear()
+    Dialog:reset()
+    Enemy:clear()
+    Gear:clear()
+    Physics:clear()
+    Map:transitionBy(dx, dy)
+    Physics:buildRoom(Map.currentRoom.enemies)
+    Physics:buildEnemies(Enemy.enemies)
+    Physics:buildPlayer(Player.player)
+end
+
+function GameState:draw()
     love.graphics.clear()
     self:drawTileMap()
     self:drawGears()
@@ -58,9 +108,15 @@ function OverworldState:draw()
     self:drawMinimap()
     self:drawEditor()
     --self:drawInventory()
+
+    -- Check if offscreen
+    local offscreen, dx, dy = Physics:checkIfOffscreen(Player.player.uuid)
+    if offscreen then
+        self.engine:trigger('roomChange', dx, dy)
+    end
 end
 
-function OverworldState:drawGears()
+function GameState:drawGears()
     local gears = self.engine.models.gear.gears
     local sprite = self.engine.images.gear
     if gears then
@@ -80,7 +136,7 @@ function OverworldState:drawGears()
     end
 end
 
-function OverworldState:drawNPCs()
+function GameState:drawNPCs()
     for key, npc in pairs(self.engine.models.npc.npcs) do
         love.graphics.setColor(0, 0, 255, 255)
         love.graphics.rectangle(
@@ -92,7 +148,7 @@ function OverworldState:drawNPCs()
     end
 end
 
-function OverworldState:drawEnemies()
+function GameState:drawEnemies()
     local enemies = self.engine.models.enemy.enemies
     if enemies then
         for uuid, enemy in pairs(enemies) do
@@ -111,7 +167,7 @@ function OverworldState:drawEnemies()
     end
 end
 
-function OverworldState:drawCrosshairs()
+function GameState:drawCrosshairs()
     local image = self.engine.images.crosshairs
     love.graphics.setColor(255, 255, 255, 255)
     love.graphics.draw(
@@ -121,7 +177,7 @@ function OverworldState:drawCrosshairs()
     )
 end
 
-function OverworldState:drawHUD()
+function GameState:drawHUD()
     love.graphics.setColor(255, 255, 255, 255)
     love.graphics.print(
         'Gears: ' .. tostring(self.engine.models.player.gears),
@@ -129,7 +185,7 @@ function OverworldState:drawHUD()
     )
 end
 
-function OverworldState:drawDialog()
+function GameState:drawDialog()
     local boxWidth = 150*3
     local boxHeight = 60*3
 
@@ -139,19 +195,19 @@ function OverworldState:drawDialog()
     local dialog = self.engine.models.dialog
     if dialog.show then
         love.graphics.setColor(0, 0, 0, 255)
-        love.graphics.roundrect(
+        util.roundrect(
             'fill', boxX, boxY,
             boxWidth, boxHeight,
             15, 15
         )
         love.graphics.setColor(255, 255, 255, 255)
-        love.graphics.roundrect(
+        util.roundrect(
             'fill', boxX + 4, boxY + 4,
             boxWidth - 8, boxHeight - 8,
             10, 10
         )
         love.graphics.setColor(0, 0, 0, 255)
-        love.graphics.roundrect(
+        util.roundrect(
             'fill', boxX + 8, boxY + 8,
             boxWidth - 16, boxHeight - 16,
             10, 10
@@ -165,7 +221,7 @@ function OverworldState:drawDialog()
     end
 end
 
-function OverworldState:drawPlayer()
+function GameState:drawPlayer()
     local player = self.engine.models.player
     local playerPhysics = self.engine.models.physics.objects[player.uuid]
     if playerPhysics then
@@ -180,7 +236,7 @@ function OverworldState:drawPlayer()
     end
 end
 
-function OverworldState:drawBullets()
+function GameState:drawBullets()
     local bullets = self.engine.models.bullet.bullets
     local objects = self.engine.models.physics.objects
     for uuid, bullet in pairs(bullets) do
@@ -198,7 +254,7 @@ function OverworldState:drawBullets()
     end
 end
 
-function OverworldState:drawTileMap()
+function GameState:drawTileMap()
     local player = self.engine.models.player
     local tilesheet = self.engine.images.tilesheet
     local map = self.engine.models.map
@@ -225,7 +281,7 @@ function OverworldState:drawTileMap()
     end
 end
 
-function OverworldState:drawVertexGroups()
+function GameState:drawVertexGroups()
     local vertexGroups = self.engine.models.physics.vertexGroups
 
     for i, vertexGroup in ipairs(vertexGroups) do
@@ -246,7 +302,7 @@ function OverworldState:drawVertexGroups()
     end
 end
 
-function OverworldState:drawInventory()
+function GameState:drawInventory()
     local boxWidth = love.graphics.getWidth() - 40
     local boxHeight = love.graphics.getHeight() + 20
 
@@ -254,26 +310,26 @@ function OverworldState:drawInventory()
     local boxY = 20
 
     love.graphics.setColor(0, 0, 0, 255)
-    love.graphics.roundrect(
+    util.roundrect(
         'fill', boxX, boxY,
         boxWidth, boxHeight,
         15, 15
     )
     love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.roundrect(
+    util.roundrect(
         'fill', boxX + 4, boxY + 4,
         boxWidth - 8, boxHeight - 8,
         10, 10
     )
     love.graphics.setColor(0, 0, 0, 255)
-    love.graphics.roundrect(
+    util.roundrect(
         'fill', boxX + 8, boxY + 8,
         boxWidth - 16, boxHeight - 16,
         10, 10
     )
 end
 
-function OverworldState:drawEditor()
+function GameState:drawEditor()
     local editor = self.engine.models.editor
     local map = self.engine.models.map
     if editor.editing then
@@ -354,7 +410,7 @@ function OverworldState:drawEditor()
     end
 end
 
-function OverworldState:drawMinimap()
+function GameState:drawMinimap()
     local mapX = 4
     local mapY = 4
     local roomWidth = 30
@@ -400,4 +456,4 @@ function OverworldState:drawMinimap()
     end
 end
 
-return OverworldState
+return GameState

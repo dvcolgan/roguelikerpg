@@ -39,13 +39,17 @@ function Bullet:onUpdate(dtInSec)
     for uuid, bullet in pairs(self.bullets) do
         bullet.timeout = bullet.timeout - dtInSec
         if bullet.timeout <= 0 then
-            self.bullets[uuid] = nil
+            self:remove(uuid)
             self.engine:trigger('bulletRemove', uuid)
         end
     end
 end
 
-function Bullet:onRoomChange(dx, dy)
+function Bullet:remove(uuid)
+    self.bullets[uuid] = nil
+end
+
+function Bullet:clear()
     self.bullets = {}
 end
 

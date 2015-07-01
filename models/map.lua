@@ -79,7 +79,7 @@ function Map:generateThisRunsRooms()
     end
 end
 
-function Map:onRoomChange(dCol, dRow, dFloor)
+function Map:transitionBy(dCol, dRow, dFloor)
     self.lastCol = self.currentCol
     self.lastRow = self.currentRow
     self.lastFloor = self.currentFloor
@@ -88,14 +88,9 @@ function Map:onRoomChange(dCol, dRow, dFloor)
     local key = tostring(self.currentCol) .. 'x' .. tostring(self.currentRow)
     if self.thisRunsRooms[self.currentFloor][key] then
         self.engine:trigger('roomNeeded', self.currentFloor, key)
+        self.currentRoom = self.thisRunsRooms[floor][key]
+        self.currentRoom.script(self.engine)
     end
-end
-
-
-function Map:onRoomNeeded(floor, key)
-    self.currentRoom = self.thisRunsRooms[floor][key]
-    self.currentRoom.script(self.engine)
-    self.engine:trigger('mapLoaded')
 end
 
 function Map:tileAt(col, row, layer)

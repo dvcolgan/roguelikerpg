@@ -14,54 +14,21 @@ function Physics:initialize(engine)
     love.physics.setMeter(G.TILE_SIZE)
     self.world = love.physics.newWorld(0, 0, true)
 
-    local that = self
-    function postSolve(a, b, coll)
-        local uuidA = a:getUserData()
-        local uuidB = b:getUserData()
-        local bullet = self.engine.models.bullet
-        local enemy = self.engine.models.enemy
-        local gear = self.engine.models.gear
-        local player = self.engine.models.player
-
-        if bullet:isBullet(uuidA) and enemy:isEnemy(uuidB) then
-            self.engine:trigger('enemyHit', uuidB)
-        end
-        if bullet:isBullet(uuidB) and enemy:isEnemy(uuidA) then
-            self.engine:trigger('enemyHit', uuidA)
-        end
-
-        if bullet:isBullet(uuidA)  then
-            self.engine:trigger('bulletCollided', uuidA)
-        end
-        if bullet:isBullet(uuidB) then
-            self.engine:trigger('bulletCollided', uuidB)
-        end
-
-        if gear:isGear(uuidA) and player:isPlayer(uuidB) then
-            self.engine:trigger('collectGear', uuidA)
-        end
-        if gear:isGear(uuidB) and player:isPlayer(uuidA) then
-            self.engine:trigger('collectGear', uuidB)
-        end
-    end
-
     self.world:setCallbacks(nil, nil, nil, postSolve)
     self.objects = {}
     self.paused = false
 end
 
 
-function Physics:clearObjects()
+function Physics:clear()
     for uuid, object in pairs(self.objects) do
         object.body:destroy()
     end
     self.objects = {}
 end
 
-function Physics:onEnemiesLoaded()
-    self:clearObjects()
-    local map = self.engine.models.map
-    self.vertexGroups = MarchingSquares:new(map.currentRoom.collision):findMapBoxVertexGroups()
+function Physics:buildRoom(mapCollision)
+    self.vertexGroups = MarchingSquares:new(collision):findMapBoxVertexGroups()
 
     for i, vertexGroup in ipairs(self.vertexGroups) do
         local object = {}
@@ -78,9 +45,10 @@ function Physics:onEnemiesLoaded()
         object.fixture:setUserData(uuid)
         self.objects[uuid] = object
     end
+end
 
+function Physics:buildEnemy(enemies)
     local enemiesPhysics = {}
-    local enemies = self.engine.models.enemy.enemies
     for uuid, enemy in pairs(enemies) do
         local enemyPhysics = {}
         enemyPhysics.body = love.physics.newBody(self.world, enemy.x, enemy.y, 'dynamic')
@@ -95,9 +63,10 @@ function Physics:onEnemiesLoaded()
         enemyPhysics.fixture:setUserData(uuid)
         self.objects[uuid] = enemyPhysics
     end
+end
 
+function Physics:buildPlayer(player)
     local playerPhysics = {}
-    local player = self.engine.models.player
     playerPhysics.body = love.physics.newBody(self.world, player.x, player.y, 'dynamic')
     playerPhysics.body:setLinearDamping(10)
 
@@ -132,7 +101,7 @@ function Physics:onEnemiesLoaded()
     self.objects[player.uuid] = playerPhysics
 end
 
-function Physics:onBulletFired(uuid, bullet)
+function Physics:buildAndFireBullet(uuid, bullet)
     local bulletPhysics = {}
     bulletPhysics.body = love.physics.newBody(self.world, bullet.x, bullet.y, 'dynamic')
     bulletPhysics.body:setX(bullet.x)
@@ -154,7 +123,7 @@ function Physics:onBulletFired(uuid, bullet)
     self.objects[uuid] = bulletPhysics
 end
 
-function Physics:onGearDropped(uuid, gear)
+function Physics:buildGear(gear)
     local gearPhysics = {}
     gearPhysics.body = love.physics.newBody(self.world, gear.x, gear.y, 'dynamic')
     gearPhysics.body:setX(gear.x)
@@ -163,7 +132,7 @@ function Physics:onGearDropped(uuid, gear)
     gearPhysics.fixture = love.physics.newFixture(gearPhysics.body, gearPhysics.shape, 1)
     gearPhysics.fixture:setRestitution(0.3)
     gearPhysics.fixture:setCategory(G.COLLISION.GEAR)
-    gearPhysics.fixture:setUserData(uuid)
+    gearPhysics.fixture:setUserData(gear.uuid)
     gearPhysics.fixture:setMask(
         G.COLLISION.ENEMY,
         G.COLLISION.PLAYER_BULLET,
@@ -177,28 +146,14 @@ function Physics:onGearDropped(uuid, gear)
     self.objects[uuid] = gearPhysics
 end
 
-function Physics:onBulletRemove(uuid)
+function Physics:remove(uuid)
     if self.objects[uuid] then
         self.objects[uuid].body:destroy()
         self.objects[uuid] = nil
     end
 end
 
-function Physics:onEnemyRemove(uuid)
-    if self.objects[uuid] then
-        self.objects[uuid].body:destroy()
-        self.objects[uuid] = nil
-    end
-end
-
-function Physics:onGearRemove(uuid)
-    if self.objects[uuid] then
-        self.objects[uuid].body:destroy()
-        self.objects[uuid] = nil
-    end
-end
-
-function Physics:onUpdate(dtInSec)
+function Physics:update(dtInSec)
     if self.paused then return end
     self.world:update(dtInSec)
 
@@ -229,28 +184,27 @@ function Physics:onUpdate(dtInSec)
     if moveDown then
         playerPhysics.body:applyForce(0, player.acceleration)
     end
-
-    -- Check if offscreen
-    if playerPhysics.body:getX() >= G.ROOM_WIDTH * G.TILE_SIZE then
-        self.engine:trigger('roomChange', 1, 0)
-        self:clearObjects()
-    elseif playerPhysics.body:getX() < 0 then
-        self.engine:trigger('roomChange', -1, 0)
-        self:clearObjects()
-    elseif playerPhysics.body:getY() >= G.ROOM_HEIGHT * G.TILE_SIZE then
-        self.engine:trigger('roomChange', 0, 1)
-        self:clearObjects()
-    elseif playerPhysics.body:getY() < 0 then
-        self.engine:trigger('roomChange', 0, -1)
-        self:clearObjects()
-    end
 end
 
-function Physics:onPausePhysics()
+function Physics:checkOffscreen(uuid)
+    local playerPhysics = self.objects[uuid]
+    if playerPhysics.body:getX() >= G.ROOM_WIDTH * G.TILE_SIZE then
+        return true, 1, 0
+    elseif playerPhysics.body:getX() < 0 then
+        return true, -1, 0
+    elseif playerPhysics.body:getY() >= G.ROOM_HEIGHT * G.TILE_SIZE then
+        return true, 0, 1
+    elseif playerPhysics.body:getY() < 0 then
+        return true, 0, -1
+    end
+    return false
+end
+
+function Physics:pause()
     self.paused = true
 end
 
-function Physics:onResumePhysics()
+function Physics:resume()
     self.paused = false
 end
 

@@ -9,29 +9,29 @@ function Gear:initialize(engine)
     self.gears = {}
 end
 
-function Gear:onSpawnGear(x, y, amount)
+function Gear:spawn(x, y, amount)
     for i = 1, amount do
         local uuid = util.uuid()
         local gear = {
+            uuid = uuid,
             x = x,
             y = y,
         }
         self.gears[uuid] = gear
-        self.engine:trigger('gearDropped', uuid, gear)
+        return gear
     end
 end
 
-function Gear:onCollectGear(uuid)
+function Gear:remove(uuid)
     self.gears[uuid] = nil
-    self.engine:trigger('gearRemove', uuid)
 end
 
 function Gear:isGear(uuid)
     return self.gears[uuid] ~= nil
 end
 
-function Gear:onRoomChange()
-    self.bullets = {}
+function Gear:clear()
+    self.gears = {}
 end
 
 return Gear

@@ -12,8 +12,12 @@ function Enemy:initialize(engine)
     self.enemyTemplates = require('scenarios/prisonship/enemies')
 end
 
-function Enemy:onRoomChange()
+function Enemy:clear()
     self.enemies = {}
+end
+
+function Enemy:remove(uuid)
+    self.enemies[uuid] = nil
 end
 
 function Enemy:isEnemy(uuid)
@@ -23,7 +27,6 @@ end
 function Enemy:onEnemyHit(uuid)
     if self.enemies[uuid] then
 
-        local enemyPhysics = self.engine.models.physics.objects[uuid]
         self.engine:trigger(
             'spawnGear',
             enemyPhysics.body:getX(),
@@ -31,14 +34,13 @@ function Enemy:onEnemyHit(uuid)
             5
         )
 
-        self.enemies[uuid] = nil
+        self:remove(uuid)
         self.engine:trigger('enemyRemove', uuid)
     end
 end
 
-
-function Enemy:onMapLoaded()
-    for i, enemy in ipairs(self.engine.models.map.currentRoom.enemies) do
+function Enemy:buildEnemies(enemies)
+    for i, enemy in ipairs(enemies) do
         local enemyTemplate = self.enemyTemplates[enemy.key]
         local uuid = util.uuid()
         self.enemies[uuid] = {
@@ -52,14 +54,9 @@ function Enemy:onMapLoaded()
             shotTime = 0,
         }
     end
-    -- TODO allow specifying events to wait on before doing
-    -- something that would allow doing this cascade of
-    -- events in one tick
-    self.engine:trigger('enemiesLoaded')
 end
 
-
-function Enemy:onUpdate(dtInSec)
+function Enemy:update(dtInSec)
     local player = self.engine.models.player
     local playerPhysics = self.engine.models.physics.objects[player.uuid]
 
