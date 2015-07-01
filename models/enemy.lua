@@ -39,6 +39,7 @@ function Enemy:buildEnemies(enemies)
         local enemyTemplate = self.enemyTemplates[enemy.key]
         local uuid = util.uuid()
         self.enemies[uuid] = {
+            uuid = uuid,
             x = enemy.col * G.TILE_SIZE + G.TILE_SIZE / 2,
             y = enemy.row * G.TILE_SIZE + G.TILE_SIZE / 2,
             radius = enemyTemplate.radius,

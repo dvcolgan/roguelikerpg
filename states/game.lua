@@ -22,30 +22,22 @@ local Engine = require('engine')
 
 local GameState = {}
 
-love.graphics.setBackgroundColor(255, 255, 255)
-love.graphics.setNewFont(18)
-love.mouse.setVisible(false)
-Physics.world:setCallbacks(nil, nil, nil, GameState.physicsPostSolve)
-
-Map:parseTileset(Asset.images.tilesheet)
-Map:generateThisRunsRooms()
-Engine:trigger('roomChange', 0, 0, 0)
-
 function GameState:onUpdate(dtInSec)
     local playerPhysics = Physics:get(Player.player.uuid)
 
     Player:syncLastCoordinates(playerPhysics)
 
     for enemyUuid, enemy in pairs(Enemy.enemies) do
-        local enemyPhysics = Physics:get(uuid)
+        local enemyPhysics = Physics:get(enemyUuid)
         if enemyPhysics then
-            local bullet = Enemy:tryFire(
+            local bulletSpec = Enemy:tryFire(
                 dtInSec,
                 enemyUuid,
                 enemyPhysics,
                 playerPhysics
             )
-            if bullet then
+            if bulletSpec then
+                local bullet = Bullet:fire(bulletSpec)
                 Physics:buildAndFireBullet(bullet)
             end
         end
@@ -59,8 +51,10 @@ function GameState:onUpdate(dtInSec)
     Physics:simulate(dtInSec)
 end
 
-
-function GameState:physicsPostSolve(a, b, coll)
+function GameState:onPhysicsPostSolve(a, b, coll)
+    if a:isDestroyed() or b:isDestroyed() then
+        return
+    end
     local uuidA = a:getUserData()
     local uuidB = b:getUserData()
     local enemyUuid = nil
@@ -81,22 +75,23 @@ function GameState:physicsPostSolve(a, b, coll)
     if bulletUuid and enemyUuid then
         -- bullet hit enemy
         local enemyPhysics = Physics:get(enemyUuid)
-        local gear = Gear:spawn(
+        local gears = Gear:spawn(
             enemyPhysics.body:getX(),
             enemyPhysics.body:getY(),
             5
         )
-        Physics:buildGear(gear)
+        for i, gear in ipairs(gears) do 
+            Physics:buildGear(gear)
+        end
         Enemy:remove(enemyUuid)
         Physics:remove(enemyUuid)
 
     elseif bulletUuid  then
-        -- bullet hit wall
-        Engine:trigger('bulletCollided', uuidA)
+        Bullet:remove(bulletUuid)
+        Physics:remove(bulletUuid)
 
     elseif gearUuid and playerUuid then
         -- player hit gear
-        Engine:trigger('collectGear', uuidA)
         Gear:remove(gearUuid)
         Physics:remove(gearUuid)
         Player:collectGears(1)
@@ -105,12 +100,12 @@ end
 
 function GameState:onMouseDown(mouseX, mouseY, button)
     if button == 'l' then
-        local bullet = Player:createBullet(
+        local bulletSpec = Player:createBullet(
             Physics:get(Player.player.uuid),
             mouseX,
             mouseY
         )
-        local bullet = Bullet:fire(bullet)
+        local bullet = Bullet:fire(bulletSpec)
         Physics:buildAndFireBullet(bullet)
     end
 end
@@ -487,5 +482,17 @@ function GameState:drawMinimap()
         end
     end
 end
+
+love.graphics.setBackgroundColor(255, 255, 255)
+love.graphics.setNewFont(18)
+love.mouse.setVisible(false)
+
+Physics.world:setCallbacks(nil, nil, nil, function(a, b, coll)
+    Engine:trigger('physicsPostSolve', a, b, coll)
+end)
+
+Map:parseTileset(Asset.images.tilesheet)
+Map:generateThisRunsRooms()
+Engine:trigger('roomChange', 0, 0, 0)
 
 return GameState

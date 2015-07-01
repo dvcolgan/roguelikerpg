@@ -5,6 +5,7 @@ local Gear = {}
 Gear.gears = {}
 
 function Gear:spawn(x, y, amount)
+    local newGears = {}
     for i = 1, amount do
         local uuid = util.uuid()
         local gear = {
@@ -13,8 +14,9 @@ function Gear:spawn(x, y, amount)
             y = y,
         }
         self.gears[uuid] = gear
-        return gear
+        table.insert(newGears, gear)
     end
+    return newGears
 end
 
 function Gear:remove(uuid)

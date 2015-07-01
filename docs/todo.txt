@@ -1,3 +1,6 @@
+bugs:
+    if you shoot off the screen it crashes
+
 starts you with random items and in a random location on the ship at the beginning of the run
 
 vents to connect foors

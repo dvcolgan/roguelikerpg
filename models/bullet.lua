@@ -5,9 +5,9 @@ local Bullet = {}
 
 Bullet.bullets = {}
 
-function Bullet:onFire(bulletSpec)
-    local uuid = util.uuid()
+function Bullet:fire(bulletSpec)
     local bullet = {
+        uuid = util.uuid(),
         x = bulletSpec.x,
         y = bulletSpec.y,
         angle = bulletSpec.angle,
@@ -15,19 +15,12 @@ function Bullet:onFire(bulletSpec)
         damage = bulletSpec.damage,
         category = bulletSpec.category,
     }
-    self.bullets[uuid] = bullet
-    self.engine:trigger('bulletFired', uuid, bullet)
+    self.bullets[bullet.uuid] = bullet
+    return bullet
 end
 
 function Bullet:isBullet(uuid)
     return self.bullets[uuid] ~= nil
-end
-
-function Bullet:onBulletCollided(uuid)
-    if self.bullets[uuid] then
-        self.bullets[uuid] = nil
-        self.engine:trigger('bulletRemove', uuid)
-    end
 end
 
 function Bullet:onUpdate(dtInSec)

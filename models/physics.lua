@@ -1,5 +1,6 @@
 local G = require('constants')
 local MarchingSquares = require('marchingsquares')
+local vector = require('vector')
 local util = require('util')
 
 
@@ -19,7 +20,6 @@ function Physics:clear()
 end
 
 function Physics:buildRoom(mapCollision)
-    print(mapCollision)
     self.vertexGroups = MarchingSquares:new(mapCollision):findMapBoxVertexGroups()
 
     for i, vertexGroup in ipairs(self.vertexGroups) do
@@ -93,7 +93,7 @@ function Physics:buildPlayer(player, map)
     self.objects[player.uuid] = playerPhysics
 end
 
-function Physics:buildAndFireBullet(uuid, bullet)
+function Physics:buildAndFireBullet(bullet)
     local bulletPhysics = {}
     bulletPhysics.body = love.physics.newBody(self.world, bullet.x, bullet.y, 'dynamic')
     bulletPhysics.body:setX(bullet.x)
@@ -102,7 +102,7 @@ function Physics:buildAndFireBullet(uuid, bullet)
     bulletPhysics.fixture = love.physics.newFixture(bulletPhysics.body, bulletPhysics.shape, 1)
     bulletPhysics.fixture:setRestitution(0.3)
     bulletPhysics.fixture:setCategory(bullet.category)
-    bulletPhysics.fixture:setUserData(uuid)
+    bulletPhysics.fixture:setUserData(bullet.uuid)
     if bullet.category == G.COLLISION.PLAYER_BULLET then
         bulletPhysics.fixture:setMask(G.COLLISION.ENEMY_BULLET)
     else
@@ -112,7 +112,7 @@ function Physics:buildAndFireBullet(uuid, bullet)
     local fx = force * math.cos(bullet.angle)
     local fy = force * math.sin(bullet.angle)
     bulletPhysics.body:applyForce(fx, fy)
-    self.objects[uuid] = bulletPhysics
+    self.objects[bullet.uuid] = bulletPhysics
 end
 
 function Physics:buildGear(gear)
@@ -130,12 +130,11 @@ function Physics:buildGear(gear)
         G.COLLISION.PLAYER_BULLET,
         G.COLLISION.ENEMY_BULLET
     )
-
     local force = 500
     local fx = math.random(force * 2) - force
     local fy = math.random(force * 2) - force
     gearPhysics.body:applyForce(fx, fy)
-    self.objects[uuid] = gearPhysics
+    self.objects[gear.uuid] = gearPhysics
 end
 
 function Physics:get(uuid)
@@ -161,19 +160,17 @@ function Physics:movePlayer(dtInSec, player, playerPhysics, states)
     local moveUp = states.comma or states.w
     local moveDown = states.o or states.s
 
-    -- Do acceleration
-    if moveLeft then
-        playerPhysics.body:applyForce(-player.acceleration, 0)
-    end
-    if moveRight then
-        playerPhysics.body:applyForce(player.acceleration, 0)
-    end
-    if moveUp then
-        playerPhysics.body:applyForce(0, -player.acceleration)
-    end
-    if moveDown then
-        playerPhysics.body:applyForce(0, player.acceleration)
-    end
+    local fx = 0
+    local fy = 0
+    if moveLeft then fx = fx - player.acceleration end
+    if moveRight then fx = fx + player.acceleration end
+    if moveUp then fy = fy - player.acceleration end
+    if moveDown then fy = fy + player.acceleration end
+    fx, fy = vector.normalize(fx, fy)
+    fx, fy = vector.mul(player.acceleration, fx, fy)
+
+    playerPhysics.body:applyForce(fx, fy)
+
 end
 
 function Physics:checkIfOffscreen(uuid)
