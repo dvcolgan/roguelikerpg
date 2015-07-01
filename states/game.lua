@@ -492,7 +492,18 @@ Physics.world:setCallbacks(nil, nil, nil, function(a, b, coll)
 end)
 
 Map:parseTileset(Asset.images.tilesheet)
-Map:generateThisRunsRooms()
+for key, roomTemplate in pairs(Map:generateThisRunsRooms()) do
+    Physics:initializeRoom(key)
+    Physics:buildRoom(key, roomTemplate.collision)
+
+    for i, enemyTemplate in ipairs(roomTemplate.enemies) do
+        Enemy:initializeRoom(key)
+        local enemy = Enemy:build(key, enemyTemplate)
+        Physics:buildEnemies(key, enemy)
+
+    Physics:buildPlayer(key, Player.player)
+end
+
 Engine:trigger('roomChange', 0, 0, 0)
 
 return GameState

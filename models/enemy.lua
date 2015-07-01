@@ -4,23 +4,21 @@ local vector = require('vector')
 
 
 local Enemy = {}
-Enemy.enemies = {}
+Enemy.enemySets = {}
+Enemy.currentEnemySet = nil
+
 Enemy.enemyTemplates = require('scenarios/prisonship/enemies')
 
-function Enemy:clear()
-    self.enemies = {}
-end
-
 function Enemy:remove(uuid)
-    self.enemies[uuid] = nil
+    self.currentEnemySet[uuid] = nil
 end
 
 function Enemy:isEnemy(uuid)
-    return self.enemies[uuid] ~= nil
+    return self.currentEnemySet[uuid] ~= nil
 end
 
 function Enemy:onEnemyHit(uuid)
-    if self.enemies[uuid] then
+    if self.currentEnemySet[uuid] then
 
         self.engine:trigger(
             'spawnGear',
@@ -34,22 +32,24 @@ function Enemy:onEnemyHit(uuid)
     end
 end
 
-function Enemy:buildEnemies(enemies)
-    for i, enemy in ipairs(enemies) do
-        local enemyTemplate = self.enemyTemplates[enemy.key]
-        local uuid = util.uuid()
-        self.enemies[uuid] = {
-            uuid = uuid,
-            x = enemy.col * G.TILE_SIZE + G.TILE_SIZE / 2,
-            y = enemy.row * G.TILE_SIZE + G.TILE_SIZE / 2,
-            radius = enemyTemplate.radius,
-            hp = enemyTemplate.hp,
-            name = enemyTemplate.name,
-            fireRate = enemyTemplate.fireRate,
-            damage = enemyTemplate.damage,
-            shotTime = 0,
-        }
-    end
+function Enemy:initializeRoom(key)
+    self.enemyPhysics[key] = {}
+end
+
+function Enemy:build(key, enemyTemplate)
+    local enemies = self.enemySets[key]
+    local uuid = util.uuid()
+    self.enemies[uuid] = {
+        uuid = uuid,
+        x = enemy.col * G.TILE_SIZE + G.TILE_SIZE / 2,
+        y = enemy.row * G.TILE_SIZE + G.TILE_SIZE / 2,
+        radius = enemyTemplate.radius,
+        hp = enemyTemplate.hp,
+        name = enemyTemplate.name,
+        fireRate = enemyTemplate.fireRate,
+        damage = enemyTemplate.damage,
+        shotTime = 0,
+    }
 end
 
 function Enemy:tryFire(dtInSec, uuid, enemyPhysics, playerPhysics)

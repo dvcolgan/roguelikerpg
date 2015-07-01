@@ -1,4 +1,5 @@
 local G = require('constants')
+local _ = require('moses')
 
 
 local Map = {}
@@ -7,7 +8,11 @@ Map.quads = {}
 
 Map.worldTemplate = require('scenarios/prisonship/world')
 Map.roomTemplates = require('scenarios/prisonship/rooms')
-Map.thisRunsRooms = {}
+
+-- Copies of the templates that we can mutate
+Map.thisRunsRoomTemplates = {}
+
+-- Pointer to the current room in thisRunsRoomTemplates
 Map.currentRoom = nil
 
 Map.currentCol = Map.worldTemplate.start.col
@@ -50,26 +55,28 @@ function Map:chooseRandomRoom(roomType)
 end
 
 function Map:generateThisRunsRooms()
-    self.thisRunsRooms = {}
+    self.thisRunsRoomTemplates = {}
     for which, floorTemplate in pairs(self.worldTemplate.floors) do
-        local floor = {}
         local i = 1
         for row = 1, self.worldTemplate.floorHeight do
             for col = 1, self.worldTemplate.floorWidth do
-                local key = tostring(col) .. 'x' .. tostring(row)
+                local key = tostring(col) .. 'x' .. tostring(row) .. 'x' .. tostring(which)
                 local char = floorTemplate.rooms[i]
                 local roomType = self.worldTemplate.roomTypes[char]
                 if roomType ~= nil then
                     roomType = 'deck'
-                    local room, index = self:chooseRandomRoom(roomType)
+                    -- Choose a random room, and make a copy so we can mutate it 
+                    -- while stil keeping the original
+                    local roomTemplate, index = self:chooseRandomRoom(roomType)
+                    local room = _.clone(roomTemplate)
                     room.index = index
-                    floor[key] = room
                 end
                 i = i + 1
+                self.thisRunsRoomTemplates[key] = floor
             end
         end
-        self.thisRunsRooms[which] = floor
     end
+    return self.thisRunsRoomTemplates
 end
 
 function Map:transitionBy(dCol, dRow, dFloor, Engine)
@@ -80,8 +87,11 @@ function Map:transitionBy(dCol, dRow, dFloor, Engine)
     self.currentRow = self.currentRow + dRow
     self.currentFloor = self.currentFloor + dFloor
     local key = tostring(self.currentCol) .. 'x' .. tostring(self.currentRow)
-    if self.thisRunsRooms[self.currentFloor][key] then
-        self.currentRoom = self.thisRunsRooms[self.currentFloor][key]
+    if self.thisRunsRoomTemplates[self.currentFloor][key] then
+        self.currentRoom = self.thisRunsRoomTemplates[self.currentFloor][key]
+
+        currentRoom.enemies
+
         --self.currentRoom.script(Engine)
     end
 end
@@ -142,7 +152,7 @@ function Map:onCreateNewRoom()
     }
 
     local key = tostring(self.currentCol) .. 'x' .. tostring(self.currentRow)
-    self.thisRunsRooms[self.currentFloor][key] = newRoom
+    self.thisRunsRoomTemplates[self.currentFloor][key] = newRoom
     table.insert(self.roomTemplates.deck, newRoom)
     newRoom.index = #self.roomTemplates.deck
 
