@@ -1,24 +1,19 @@
-local class = require('middleclass')
 local G = require('constants')
 
 
-local Editor = class('Editor')
-
-function Editor:initialize(engine)
-    self.engine = engine
-    self.editing = false
-    self.selectedTile = 0
-    self.showTiles = false
-    self.selectedLayer = 1
-    self.hoveredRoomTile = {
-        col = 0,
-        row = 0,
-    }
-    self.hoveredTilesheetTile = {
-        col = 0,
-        row = 0,
-    }
-end
+local Editor = {}
+Editor.editing = false
+Editor.selectedTile = 0
+Editor.showTiles = false
+Editor.selectedLayer = 1
+Editor.hoveredRoomTile = {
+    col = 0,
+    row = 0,
+}
+Editor.hoveredTilesheetTile = {
+    col = 0,
+    row = 0,
+}
 
 function Editor:onMouseDown(x, y, button)
     if self.editing then

@@ -1,15 +1,9 @@
-local class = require('middleclass')
-local G = require('constants')
+local Dialog = {}
 
-
-local Dialog = class('Dialog')
-
-function Dialog:initialize(engine)
-    self.engine = engine
-    self.show = false
-    self.text = ''
-    self.speaker = ''
-end
+Dialog.engine = engine
+Dialog.show = false
+Dialog.text = ''
+Dialog.speaker = ''
 
 function Dialog:onSayNPC(key, words)
     local npc = self.engine.models.npc.npcs[key]

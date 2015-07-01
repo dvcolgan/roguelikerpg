@@ -1,16 +1,11 @@
-local class = require('middleclass')
 local util = require('util')
 local G = require('constants')
 local vector = require('vector')
 
 
-local Enemy = class('Enemy')
-
-function Enemy:initialize(engine)
-    self.engine = engine
-    self.enemies = {}
-    self.enemyTemplates = require('scenarios/prisonship/enemies')
-end
+local Enemy = {}
+Enemy.enemies = {}
+Enemy.enemyTemplates = require('scenarios/prisonship/enemies')
 
 function Enemy:clear()
     self.enemies = {}
@@ -56,12 +51,9 @@ function Enemy:buildEnemies(enemies)
     end
 end
 
-function Enemy:update(dtInSec)
-    local player = self.engine.models.player
-    local playerPhysics = self.engine.models.physics.objects[player.uuid]
-
-    for uuid, enemy in pairs(self.enemies) do
-        local enemyPhysics = self.engine.models.physics.objects[uuid]
+function Enemy:tryFire(dtInSec, uuid, enemyPhysics, playerPhysics)
+    local enemy = self.enemies[uuid]
+    if enemy then
         enemy.shotTime = enemy.shotTime + dtInSec
         if enemy.shotTime >= enemy.fireRate then
             local targetX = playerPhysics.body:getX()
@@ -73,18 +65,17 @@ function Enemy:update(dtInSec)
                 targetY - startY,
                 targetX - startX
             )
+            enemy.shotTime = 0
 
-            self.engine:trigger('fire', {
+            return {
                 damage = enemy.damage,
                 x = startX,
                 y = startY,
                 angle = angle,
                 category = G.COLLISION.ENEMY_BULLET,
-            })
-            enemy.shotTime = 0
+            }
         end
     end
 end
 
 return Enemy
-

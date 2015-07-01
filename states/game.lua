@@ -1,32 +1,64 @@
-local class = require('middleclass')
 local util = require('util')
-local GameState = require('lib/state')
 local G = require('constants')
 
+local Asset = require('models/asset')
 local Bullet = require('models/bullet')
 local Dialog = require('models/dialog')
+local Editor = require('models/editor')
 local Enemy = require('models/enemy')
-local Player = require('models/player')
+local Flag = require('models/flag')
 local Gear = require('models/gear')
+local Inventory = require('models/inventory')
+local Item = require('models/item')
+local Key = require('models/key')
+local Map = require('models/map')
+local NPC = require('models/npc')
 local Physics = require('models/physics')
-local Asset = require('models/asset')
+local Player = require('models/player')
 
 
-local GameState = class('GameState', GameState)
+local Engine = require('engine')
 
-function GameState:create()
-    love.graphics.setBackgroundColor(255, 255, 255)
-    love.graphics.setNewFont(18)
-    self.engine:trigger('roomChange', 0, 0)
-    love.mouse.setVisible(false)
-    Physics.world:setCallbacks(nil, nil, nil, self.physicsPostSolve)
+
+local GameState = {}
+
+love.graphics.setBackgroundColor(255, 255, 255)
+love.graphics.setNewFont(18)
+love.mouse.setVisible(false)
+Physics.world:setCallbacks(nil, nil, nil, GameState.physicsPostSolve)
+
+Map:parseTileset(Asset.images.tilesheet)
+Map:generateThisRunsRooms()
+Engine:trigger('roomChange', 0, 0, 0)
+
+function GameState:onUpdate(dtInSec)
+    local playerPhysics = Physics:get(Player.player.uuid)
+
+    Player:syncLastCoordinates(playerPhysics)
+
+    for enemyUuid, enemy in pairs(Enemy.enemies) do
+        local enemyPhysics = Physics:get(uuid)
+        if enemyPhysics then
+            local bullet = Enemy:tryFire(
+                dtInSec,
+                enemyUuid,
+                enemyPhysics,
+                playerPhysics
+            )
+            if bullet then
+                Physics:buildAndFireBullet(bullet)
+            end
+        end
+    end
+    Physics:movePlayer(
+        dtInSec,
+        Player.player,
+        playerPhysics,
+        Key.states
+    )
+    Physics:simulate(dtInSec)
 end
 
-function GameState:update(dtInSec)
-    Player:syncLastCoordinates()
-    Enemy:update(dtInSec)
-    Physics:update(dtInSec)
-end
 
 function GameState:physicsPostSolve(a, b, coll)
     local uuidA = a:getUserData()
@@ -60,11 +92,11 @@ function GameState:physicsPostSolve(a, b, coll)
 
     elseif bulletUuid  then
         -- bullet hit wall
-        self.engine:trigger('bulletCollided', uuidA)
+        Engine:trigger('bulletCollided', uuidA)
 
     elseif gearUuid and playerUuid then
         -- player hit gear
-        self.engine:trigger('collectGear', uuidA)
+        Engine:trigger('collectGear', uuidA)
         Gear:remove(gearUuid)
         Physics:remove(gearUuid)
         Player:collectGears(1)
@@ -78,20 +110,34 @@ function GameState:onMouseDown(mouseX, mouseY, button)
             mouseX,
             mouseY
         )
-        local Bullet:fire(bullet)
+        local bullet = Bullet:fire(bullet)
+        Physics:buildAndFireBullet(bullet)
     end
 end
 
-function GameState:onRoomChange(dx, dy)
+function GameState:onKeyDown(key)
+    Key:keyDown(key)
+end
+
+function GameState:onKeyUp(key)
+    Key:keyUp(key)
+end
+
+function GameState:onRoomChange(dCol, dRow, dFloor)
     Bullet:clear()
     Dialog:reset()
     Enemy:clear()
     Gear:clear()
     Physics:clear()
-    Map:transitionBy(dx, dy)
-    Physics:buildRoom(Map.currentRoom.enemies)
+
+    -- Set up the nonphysics data for this room
+    Map:transitionBy(dCol, dRow, dFloor, Engine)
+    Enemy:buildEnemies(Map.currentRoom.enemies)
+
+    -- Based on that build the physics objects
+    Physics:buildRoom(Map.currentRoom.collision)
     Physics:buildEnemies(Enemy.enemies)
-    Physics:buildPlayer(Player.player)
+    Physics:buildPlayer(Player.player, Map)
 end
 
 function GameState:draw()
@@ -106,38 +152,36 @@ function GameState:draw()
     self:drawHUD()
     self:drawDialog()
     self:drawMinimap()
-    self:drawEditor()
+    --self:drawEditor()
     --self:drawInventory()
 
     -- Check if offscreen
     local offscreen, dx, dy = Physics:checkIfOffscreen(Player.player.uuid)
     if offscreen then
-        self.engine:trigger('roomChange', dx, dy)
+        Engine:trigger('roomChange', dx, dy, 0)
     end
 end
 
 function GameState:drawGears()
-    local gears = self.engine.models.gear.gears
-    local sprite = self.engine.images.gear
-    if gears then
-        for uuid, gear in pairs(gears) do
-            local gearPhysics = self.engine.models.physics.objects[uuid]
-            if gearPhysics then
-                love.graphics.draw(sprite,
-                    gearPhysics.body:getX(),
-                    gearPhysics.body:getY(),
-                    gearPhysics.body:getAngle(),
-                    1, 1,
-                    G.GEAR_SIZE / 2,
-                    G.GEAR_SIZE / 2
-                )
-            end
+    local gearImage = Asset.images.gear
+    for uuid, gear in pairs(Gear.gears) do
+        local gearPhysics = Physics:get(uuid)
+        if gearPhysics then
+            love.graphics.draw(
+                gearImage,
+                gearPhysics.body:getX(),
+                gearPhysics.body:getY(),
+                gearPhysics.body:getAngle(),
+                1, 1,
+                G.GEAR_SIZE / 2,
+                G.GEAR_SIZE / 2
+            )
         end
     end
 end
 
 function GameState:drawNPCs()
-    for key, npc in pairs(self.engine.models.npc.npcs) do
+    for uuid, npc in pairs(NPC.npcs) do
         love.graphics.setColor(0, 0, 255, 255)
         love.graphics.rectangle(
             'fill',
@@ -149,29 +193,26 @@ function GameState:drawNPCs()
 end
 
 function GameState:drawEnemies()
-    local enemies = self.engine.models.enemy.enemies
-    if enemies then
-        for uuid, enemy in pairs(enemies) do
-            local enemyPhysics = self.engine.models.physics.objects[uuid]
-            if enemyPhysics then
-                love.graphics.setColor(255, 0, 0, 255)
-                love.graphics.circle(
-                    'fill',
-                    enemyPhysics.body:getX(),
-                    enemyPhysics.body:getY(),
-                    enemyPhysics.shape:getRadius(),
-                    16
-                )
-            end
+    for uuid, enemy in pairs(Enemy.enemies) do
+        local enemyPhysics = Physics:get(uuid)
+        if enemyPhysics then
+            love.graphics.setColor(255, 0, 0, 255)
+            love.graphics.circle(
+                'fill',
+                enemyPhysics.body:getX(),
+                enemyPhysics.body:getY(),
+                enemyPhysics.shape:getRadius(),
+                16
+            )
         end
     end
 end
 
 function GameState:drawCrosshairs()
-    local image = self.engine.images.crosshairs
+    local image = Asset.images.crosshairs
     love.graphics.setColor(255, 255, 255, 255)
     love.graphics.draw(
-        image,
+        Asset.images.crosshairs,
         love.mouse.getX() - image:getWidth() / 2,
         love.mouse.getY() - image:getHeight() / 2
     )
@@ -180,7 +221,7 @@ end
 function GameState:drawHUD()
     love.graphics.setColor(255, 255, 255, 255)
     love.graphics.print(
-        'Gears: ' .. tostring(self.engine.models.player.gears),
+        'Gears: ' .. tostring(Player.player.gears),
         20, 20
     )
 end
@@ -192,8 +233,7 @@ function GameState:drawDialog()
     local boxX = love.graphics.getWidth() - boxWidth - 20
     local boxY = 20
 
-    local dialog = self.engine.models.dialog
-    if dialog.show then
+    if Dialog.show then
         love.graphics.setColor(0, 0, 0, 255)
         util.roundrect(
             'fill', boxX, boxY,
@@ -214,7 +254,7 @@ function GameState:drawDialog()
         )
         love.graphics.setColor(255, 255, 255, 255)
         love.graphics.printf(
-            dialog.speaker .. ': ' .. dialog.text,
+            Dialog.speaker .. ': ' .. Dialog.text,
             boxX + 20, boxY + 20,
             boxWidth - 40
         )
@@ -222,8 +262,7 @@ function GameState:drawDialog()
 end
 
 function GameState:drawPlayer()
-    local player = self.engine.models.player
-    local playerPhysics = self.engine.models.physics.objects[player.uuid]
+    local playerPhysics = Physics:get(Player.player.uuid)
     if playerPhysics then
         love.graphics.setColor(0, 0, 0, 255)
         love.graphics.circle(
@@ -237,10 +276,8 @@ function GameState:drawPlayer()
 end
 
 function GameState:drawBullets()
-    local bullets = self.engine.models.bullet.bullets
-    local objects = self.engine.models.physics.objects
-    for uuid, bullet in pairs(bullets) do
-        local bulletPhysics = objects[uuid]
+    for uuid, bullet in pairs(Bullet.bullets) do
+        local bulletPhysics = Physics:get(uuid)
         if bulletPhysics then
             love.graphics.setColor(50, 50, 50, 255)
             love.graphics.circle(
@@ -255,21 +292,19 @@ function GameState:drawBullets()
 end
 
 function GameState:drawTileMap()
-    local player = self.engine.models.player
-    local tilesheet = self.engine.images.tilesheet
-    local map = self.engine.models.map
+    local tilesheet = Asset.images.tilesheet
 
     love.graphics.setColor(255, 255, 255, 255)
-    if map.currentRoom then
-        for layer = 1, #map.currentRoom.layers do
+    if Map.currentRoom then
+        for layer = 1, #Map.currentRoom.layers do
             for row = 1, G.ROOM_HEIGHT do
                 for col = 1, G.ROOM_WIDTH do
-                    local tile = map:tileAt(col, row, layer)
+                    local tile = Map:tileAt(col, row, layer)
                     if tile ~= nil then
                         if tile > 0 then
                             love.graphics.draw(
                                 tilesheet,
-                                map.quads[tile],
+                                Map.quads[tile],
                                 math.floor((col-1) * G.TILE_SIZE),
                                 math.floor((row-1) * G.TILE_SIZE)
                             ) 
@@ -282,9 +317,7 @@ function GameState:drawTileMap()
 end
 
 function GameState:drawVertexGroups()
-    local vertexGroups = self.engine.models.physics.vertexGroups
-
-    for i, vertexGroup in ipairs(vertexGroups) do
+    for i, vertexGroup in ipairs(Physics.vertexGroups) do
         love.graphics.setColor(
             vertexGroup.color.r,
             vertexGroup.color.g,
@@ -330,13 +363,13 @@ function GameState:drawInventory()
 end
 
 function GameState:drawEditor()
-    local editor = self.engine.models.editor
-    local map = self.engine.models.map
+    local editor = Engine.models.editor
+    local map = Engine.models.map
     if editor.editing then
         -- Draw the solid parts of the map if we are editing the collision layer
         if editor.selectedLayer == 0 then
 
-            local collision = self.engine.models.map.currentRoom.collision
+            local collision = Engine.models.map.currentRoom.collision
 
             for row = 1, G.ROOM_HEIGHT do
                 for col = 1, G.ROOM_WIDTH do
@@ -367,7 +400,7 @@ function GameState:drawEditor()
         if editor.showTiles then
             love.graphics.clear()
             love.graphics.draw(
-                self.engine.images.tilesheetSmall,
+                Engine.images.tilesheetSmall,
                 0, 0
             )
         end
@@ -416,10 +449,9 @@ function GameState:drawMinimap()
     local roomWidth = 30
     local roomHeight = 18
     local padding = 4
-    local map = self.engine.models.map
     love.graphics.setLineWidth(2)
 
-    local rooms = map.thisRunsRooms[map.currentFloor]
+    local rooms = Map.thisRunsRooms[Map.currentFloor]
     if rooms then
         for row = 1, G.ROOM_HEIGHT do
             for col = 1, G.ROOM_WIDTH do
@@ -430,7 +462,7 @@ function GameState:drawMinimap()
                 local room = rooms[key]
 
                 if room then
-                    if col == map.currentCol and row == map.currentRow then
+                    if col == Map.currentCol and row == Map.currentRow then
                         love.graphics.setColor(0, 0, 0, 255)
                         love.graphics.rectangle(
                             'fill',

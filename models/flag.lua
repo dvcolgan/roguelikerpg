@@ -1,12 +1,6 @@
-local class = require('middleclass')
+local Flag = {}
 
-
-local Flag = class('Flag')
-
-function Flag:initialize(engine)
-    self.engine = engine
-    self.flags = {}
-end
+Flag.flags = {}
 
 function Flag:onFlagSet(name, value)
     self.flags[name] = value

@@ -1,13 +1,8 @@
-local class = require('middleclass')
 local util = require('util')
 
 
-local Gear = class('Gear')
-
-function Gear:initialize(engine)
-    self.engine = engine
-    self.gears = {}
-end
+local Gear = {}
+Gear.gears = {}
 
 function Gear:spawn(x, y, amount)
     for i = 1, amount do

@@ -1,24 +1,15 @@
-local class = require('middleclass')
 local G = require('constants')
-local MarchingSquares = require('lib/marchingsquares')
+local MarchingSquares = require('marchingsquares')
 local util = require('util')
 
 
-local Physics = class('Physics')
+local Physics = {}
+Physics.vertexGroups = {}
+love.physics.setMeter(G.TILE_SIZE)
+Physics.world = love.physics.newWorld(0, 0, true)
 
-
-function Physics:initialize(engine)
-    self.engine = engine
-    self.vertexGroups = {}
-
-    love.physics.setMeter(G.TILE_SIZE)
-    self.world = love.physics.newWorld(0, 0, true)
-
-    self.world:setCallbacks(nil, nil, nil, postSolve)
-    self.objects = {}
-    self.paused = false
-end
-
+Physics.objects = {}
+Physics.paused = false
 
 function Physics:clear()
     for uuid, object in pairs(self.objects) do
@@ -28,7 +19,8 @@ function Physics:clear()
 end
 
 function Physics:buildRoom(mapCollision)
-    self.vertexGroups = MarchingSquares:new(collision):findMapBoxVertexGroups()
+    print(mapCollision)
+    self.vertexGroups = MarchingSquares:new(mapCollision):findMapBoxVertexGroups()
 
     for i, vertexGroup in ipairs(self.vertexGroups) do
         local object = {}
@@ -47,7 +39,7 @@ function Physics:buildRoom(mapCollision)
     end
 end
 
-function Physics:buildEnemy(enemies)
+function Physics:buildEnemies(enemies)
     local enemiesPhysics = {}
     for uuid, enemy in pairs(enemies) do
         local enemyPhysics = {}
@@ -65,7 +57,7 @@ function Physics:buildEnemy(enemies)
     end
 end
 
-function Physics:buildPlayer(player)
+function Physics:buildPlayer(player, map)
     local playerPhysics = {}
     playerPhysics.body = love.physics.newBody(self.world, player.x, player.y, 'dynamic')
     playerPhysics.body:setLinearDamping(10)
@@ -146,6 +138,10 @@ function Physics:buildGear(gear)
     self.objects[uuid] = gearPhysics
 end
 
+function Physics:get(uuid)
+    return self.objects[uuid]
+end
+
 function Physics:remove(uuid)
     if self.objects[uuid] then
         self.objects[uuid].body:destroy()
@@ -153,19 +149,13 @@ function Physics:remove(uuid)
     end
 end
 
-function Physics:update(dtInSec)
+function Physics:simulate(dtInSec)
     if self.paused then return end
+
     self.world:update(dtInSec)
+end
 
-    local player = self.engine.models.player
-    if player.frozen then
-        return
-    end
-
-    local playerPhysics = self.objects[player.uuid]
-    if playerPhysics == nil then return end
-    states = self.engine.models.key.states
-
+function Physics:movePlayer(dtInSec, player, playerPhysics, states)
     local moveLeft = states.a
     local moveRight = states.e or states.d
     local moveUp = states.comma or states.w
@@ -186,7 +176,7 @@ function Physics:update(dtInSec)
     end
 end
 
-function Physics:checkOffscreen(uuid)
+function Physics:checkIfOffscreen(uuid)
     local playerPhysics = self.objects[uuid]
     if playerPhysics.body:getX() >= G.ROOM_WIDTH * G.TILE_SIZE then
         return true, 1, 0

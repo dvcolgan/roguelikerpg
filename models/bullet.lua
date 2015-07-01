@@ -1,14 +1,9 @@
-local class = require('middleclass')
-local _ = require('moses')
 local util = require('util')
 
 
-local Bullet = class('Bullet')
+local Bullet = {}
 
-function Bullet:initialize(engine)
-    self.engine = engine
-    self.bullets = {}
-end
+Bullet.bullets = {}
 
 function Bullet:onFire(bulletSpec)
     local uuid = util.uuid()

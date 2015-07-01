@@ -1,12 +1,6 @@
-local class = require('middleclass')
+local NPC = {}
 
-
-local NPC = class('NPC')
-
-function NPC:initialize(engine)
-    self.engine = engine
-    self.npcs = {}
-end
+NPC.npcs = {}
 
 function NPC:onAddNPC(npcData)
     self.npcs[npcData.key] = {

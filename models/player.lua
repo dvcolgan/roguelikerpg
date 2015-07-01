@@ -1,46 +1,43 @@
-local class = require('middleclass')
 local G = require('constants')
-local vector = require('vector')
 local util = require('util')
 
 
-local Player = class('Player')
+local Player = {}
 
-function Player:initialize(engine)
-    self.engine = engine
-    self.uuid = util.uuid()
-    self.lastX = 0
-    self.lastY = 0
-    self.direction = 'left'
-    self.acceleration = 2000
-    self.drag = 30
-    self.maxSpeed = 3
-    self.frozen = false
-    self.damage = 10
-    self.gears = 0
-end
+Player.player = {
+    uuid = util.uuid(),
+    lastX = 0,
+    lastY = 0,
+    direction = 'left',
+    acceleration = 2000,
+    drag = 30,
+    maxSpeed = 3,
+    frozen = false,
+    damage = 10,
+    gears = 0,
+}
 
 function Player:pause()
-    self.frozen = true
+    self.player.frozen = true
 end
 
 function Player:resume()
-    self.frozen = false
+    self.player.frozen = false
 end
 
 function Player:syncLastCoordinates(playerPhysics)
     if playerPhysics then
-        self.lastX = playerPhysics.body:getX()
-        self.lastY = playerPhysics.body:getY()
+        self.player.lastX = playerPhysics.body:getX()
+        self.player.lastY = playerPhysics.body:getY()
     end
 end
 
 function Player:isPlayer(uuid)
-    return self.uuid == uuid
+    return self.player.uuid == uuid
 end
 
 function Player:collectGears(number)
-    self.gears = self.gears + number
+    self.player.gears = self.player.gears + number
 end
 
 function Player:createBullet(playerPhysics, targetX, targetY)
@@ -53,7 +50,7 @@ function Player:createBullet(playerPhysics, targetX, targetY)
         )
 
         return {
-            damage = self.damage,
+            damage = self.player.damage,
             x = playerX,
             y = playerY,
             angle = angle,

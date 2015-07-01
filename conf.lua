@@ -1,5 +1,6 @@
 function love.conf(t)
     io.stdout:setvbuf("no")
+    table.inspect = require('inspect')
     t.identity = "roguelike"
     t.version = "0.9.2"
     t.console = false

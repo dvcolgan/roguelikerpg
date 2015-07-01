@@ -1,33 +1,25 @@
-local class = require('middleclass')
 local G = require('constants')
 
 
-local Map = class('Map')
+local Map = {}
 
-function Map:initialize(engine)
-    self.engine = engine
-    self.quads = {}
-    
-    self.worldTemplate = require('scenarios/prisonship/world')
-    self.roomTemplates = require('scenarios/prisonship/rooms')
-    self.thisRunsRooms = {}
-    self.currentRoom = nil
+Map.quads = {}
 
-    self.currentCol = self.worldTemplate.start.col
-    self.currentRow = self.worldTemplate.start.row
-    self.currentFloor = self.worldTemplate.start.floor
-    self.lastCol = self.col
-    self.lastRow = self.row
-    self.lastFloor = self.floor
+Map.worldTemplate = require('scenarios/prisonship/world')
+Map.roomTemplates = require('scenarios/prisonship/rooms')
+Map.thisRunsRooms = {}
+Map.currentRoom = nil
 
-    self:parseTileset()
-    self:generateThisRunsRooms()
-end
+Map.currentCol = Map.worldTemplate.start.col
+Map.currentRow = Map.worldTemplate.start.row
+Map.currentFloor = Map.worldTemplate.start.floor
+Map.lastCol = Map.col
+Map.lastRow = Map.row
+Map.lastFloor = Map.floor
 
-function Map:parseTileset()
+function Map:parseTileset(tilesheet)
     -- Parse the tileset into quads
     self.quads = {}
-    local tilesheet = engine.images.tilesheet
     local tilesheetWidth = tilesheet:getWidth()
     local tilesheetHeight = tilesheet:getHeight()
     local tilesWide = math.floor(tilesheetWidth / G.TILE_SIZE)
@@ -79,17 +71,17 @@ function Map:generateThisRunsRooms()
     end
 end
 
-function Map:transitionBy(dCol, dRow, dFloor)
+function Map:transitionBy(dCol, dRow, dFloor, Engine)
     self.lastCol = self.currentCol
     self.lastRow = self.currentRow
     self.lastFloor = self.currentFloor
     self.currentCol = self.currentCol + dCol
     self.currentRow = self.currentRow + dRow
+    self.currentFloor = self.currentFloor + dFloor
     local key = tostring(self.currentCol) .. 'x' .. tostring(self.currentRow)
     if self.thisRunsRooms[self.currentFloor][key] then
-        self.engine:trigger('roomNeeded', self.currentFloor, key)
-        self.currentRoom = self.thisRunsRooms[floor][key]
-        self.currentRoom.script(self.engine)
+        self.currentRoom = self.thisRunsRooms[self.currentFloor][key]
+        --self.currentRoom.script(Engine)
     end
 end
 
@@ -111,6 +103,7 @@ function Map:onChangeTile(col, row, layer, tile)
     local index = (row-1) * G.ROOM_WIDTH + col
     self.currentRoom.layers[layer][index] = tile
 end
+
 function Map:onChangeCollision(col, row, collidable)
     local index = (row-1) * G.ROOM_WIDTH + col
     self.currentRoom.collision[index] = collidable
