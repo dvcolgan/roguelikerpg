@@ -44,6 +44,7 @@ function Enemy:build(key, enemyData)
 end
 
 function Enemy:tryFire(dtInSec, uuid, enemyPhysics, playerPhysics)
+    do return end
     local enemy = self.currentEnemySet[uuid]
     if enemy then
         enemy.shotTime = enemy.shotTime + dtInSec

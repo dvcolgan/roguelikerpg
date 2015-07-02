@@ -55,9 +55,7 @@ function Engine:triggerAfter(delay, eventName,
 end
 
 function Engine:update(dtInSec)
-    self:trigger('update', dtInSec)
     self:pump(dtInSec)
-
     if self.state.onUpdate then
         self.state:onUpdate(dtInSec)
     end

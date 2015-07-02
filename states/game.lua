@@ -49,10 +49,17 @@ function GameState:onUpdate(dtInSec)
         Key.states
     )
     Physics:simulate(dtInSec)
+
+    -- Check if offscreen
+    local offscreen, dx, dy = Physics:checkIfOffscreen(Player.player.uuid)
+    if offscreen then
+        Engine:trigger('roomChange', dx, dy, 0)
+    end
 end
 
 function GameState:onPhysicsPostSolve(a, b, coll)
     if a:isDestroyed() or b:isDestroyed() then
+        print('returned early')
         return
     end
     local uuidA = a:getUserData()
@@ -73,6 +80,7 @@ function GameState:onPhysicsPostSolve(a, b, coll)
     if Player:isPlayer(uuidB) then playerUuid = uuidB end
 
     if bulletUuid and enemyUuid then
+        print('bullet hit enemy')
         -- bullet hit enemy
         local enemyPhysics = Physics:get(enemyUuid)
         local gears = Gear:spawn(
@@ -87,11 +95,12 @@ function GameState:onPhysicsPostSolve(a, b, coll)
         Physics:remove(enemyUuid)
 
     elseif bulletUuid  then
+        print('bullet hit wall')
         Bullet:remove(bulletUuid)
         Physics:remove(bulletUuid)
 
     elseif gearUuid and playerUuid then
-        -- player hit gear
+        print('player hit gear')
         Gear:remove(gearUuid)
         Physics:remove(gearUuid)
         Player:collectGears(1)
@@ -119,8 +128,13 @@ function GameState:onKeyUp(key)
 end
 
 function GameState:onRoomChange(dCol, dRow, dFloor)
+    print('changing room')
+    local playerPhysics = Physics:get(Player.player.uuid)
+    if playerPhysics then
+        playerPhysics.body:setLinearVelocity(0, 0)
+    end
+
     local key = Map:transitionBy(dCol, dRow, dFloor, Engine)
-    Enemy:activateRoom(key)
     Physics:activateRoom(key)
     Physics:positionPlayerOnRoomEnter(
         key,
@@ -128,8 +142,8 @@ function GameState:onRoomChange(dCol, dRow, dFloor)
         Physics:get(Player.player.uuid),
         Map
     )
+    Enemy:activateRoom(key)
 end
-
 
 function GameState:draw()
     love.graphics.clear()
@@ -145,12 +159,6 @@ function GameState:draw()
     self:drawMinimap()
     --self:drawEditor()
     --self:drawInventory()
-
-    -- Check if offscreen
-    local offscreen, dx, dy = Physics:checkIfOffscreen(Player.player.uuid)
-    if offscreen then
-        Engine:trigger('roomChange', dx, dy, 0)
-    end
 end
 
 function GameState:drawGears()
@@ -442,11 +450,11 @@ function GameState:drawMinimap()
     local padding = 4
     love.graphics.setLineWidth(2)
 
-    local rooms = Map.thisRunsRoomTemplates[Map.currentFloor]
+    local rooms = Map.thisRunsRoomTemplates
     if rooms then
         for row = 1, G.ROOM_HEIGHT do
             for col = 1, G.ROOM_WIDTH do
-                local key = tostring(col) .. 'x' .. tostring(row)
+                local key = tostring(col) .. 'x' .. tostring(row) .. 'x3'
 
                 local drawX = mapX + col * (roomWidth + padding)
                 local drawY = mapY + row * (roomHeight + padding)
@@ -494,8 +502,8 @@ for key, roomTemplate in pairs(Map:generateThisRunsRooms()) do
 
     Physics:buildRoom(key, roomTemplate.collision)
 
+    Enemy:initializeRoom(key)
     for i, enemyData in ipairs(roomTemplate.enemies) do
-        Enemy:initializeRoom(key)
         local enemy = Enemy:build(key, enemyData)
         Physics:buildEnemy(key, enemy)
     end

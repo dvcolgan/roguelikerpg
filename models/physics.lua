@@ -11,8 +11,8 @@ Physics.worlds = {}
 Physics.objectSets = {}
 
 Physics.currentWorld = nil
-Physics.currentObjects = nil
-Physics.currentVertexGroups = nil
+Physics.currentObjects = {}
+Physics.currentVertexGroups = {}
 
 Physics.paused = false
 
@@ -191,19 +191,18 @@ function Physics:movePlayer(dtInSec, player, playerPhysics, states)
     fx, fy = vector.mul(player.acceleration, fx, fy)
 
     playerPhysics.body:applyForce(fx, fy)
-
 end
 
 function Physics:checkIfOffscreen(uuid)
-    local playerPhysics = self.currentObjects[uuid]
-    if playerPhysics then
-        if playerPhysics.body:getX() >= G.ROOM_WIDTH * G.TILE_SIZE then
+    local object = self.currentObjects[uuid]
+    if object then
+        if object.body:getX() >= G.ROOM_WIDTH * G.TILE_SIZE then
             return true, 1, 0
-        elseif playerPhysics.body:getX() < 0 then
+        elseif object.body:getX() < 0 then
             return true, -1, 0
-        elseif playerPhysics.body:getY() >= G.ROOM_HEIGHT * G.TILE_SIZE then
+        elseif object.body:getY() >= G.ROOM_HEIGHT * G.TILE_SIZE then
             return true, 0, 1
-        elseif playerPhysics.body:getY() < 0 then
+        elseif object.body:getY() < 0 then
             return true, 0, -1
         end
     end
