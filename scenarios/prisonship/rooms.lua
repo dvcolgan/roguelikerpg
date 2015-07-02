@@ -31,7 +31,9 @@ return {
                 {key = 'scout', col = 2, row = 6},
                 {key = 'scout', col = 12, row = 6},
             },
-            items = {},
+            items = {
+                {key = 'pinCannon', col = 3, row = 3},
+            },
             script = function(engine) end,
         },
         {

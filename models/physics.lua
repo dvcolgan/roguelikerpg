@@ -78,7 +78,7 @@ function Physics:buildPlayer(key, player)
     playerPhysics.body = love.physics.newBody(world, 0, 0, 'dynamic')
     playerPhysics.body:setLinearDamping(10)
 
-    playerPhysics.shape = love.physics.newCircleShape(24)
+    playerPhysics.shape = love.physics.newCircleShape(G.PLAYER_RADIUS)
     playerPhysics.fixture = love.physics.newFixture(playerPhysics.body, playerPhysics.shape, 1)
     playerPhysics.fixture:setRestitution(0.2)
     playerPhysics.fixture:setCategory(G.COLLISION.PLAYER)

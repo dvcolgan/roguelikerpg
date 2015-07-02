@@ -9,7 +9,7 @@ Player.player = {
     lastX = 0,
     lastY = 0,
     direction = 'left',
-    acceleration = 2000,
+    acceleration = 1000,
     drag = 30,
     maxSpeed = 3,
     frozen = false,
@@ -18,6 +18,7 @@ Player.player = {
 
     health = 100,
     maxHealth = 100,
+    items = {},
 }
 
 function Player:pause()
@@ -26,6 +27,10 @@ end
 
 function Player:resume()
     self.player.frozen = false
+end
+
+function Player:addItem(key)
+    table.insert(self.player.items, key)
 end
 
 function Player:syncLastCoordinates(playerPhysics)

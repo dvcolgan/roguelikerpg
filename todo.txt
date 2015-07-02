@@ -1,5 +1,3 @@
-implement health for enemies and player
-draw the health bar
 allow picking up items with space
 allow items to modify your shot
 make enemies based on what items they have
@@ -14,6 +12,11 @@ different areas of the ship are more unlocked if you get keys from things
 enemies are made up of random parts
 they always drop gears, and have a random chance of dropping something larger that they were carrying
 randomize bosses
+
+add a hunger component?
+
+add familiars
+add cosmetic items
 
 implement momentum and knockback
 

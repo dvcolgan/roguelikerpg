@@ -118,6 +118,25 @@ end
 
 function GameState:onKeyDown(key)
     Key:keyDown(key)
+
+    if key == 'space' then
+        --[[
+        --find the players location in the room
+        --find the nearest item
+        --if the nearest item is close enough
+        --remove the item from the floor
+        --add the item to the players' inventory
+        --]]
+        local playerPhysics = Physics:get(Player.player.uuid)
+        local item = Item:pickUp(
+            playerPhysics.body:getX(),
+            playerPhysics.body:getY()
+        )
+        if item then
+            Player:addItem(item.key)
+            Item:remove(item.uuid)
+        end
+    end
 end
 
 function GameState:onKeyUp(key)
@@ -139,11 +158,13 @@ function GameState:onRoomChange(dCol, dRow, dFloor)
         Map
     )
     Enemy:activateRoom(key)
+    Item:activateRoom(key)
 end
 
 function GameState:draw()
     love.graphics.clear()
     self:drawTileMap()
+    self:drawItemsOnGround()
     self:drawGears()
     self:drawPlayer()
     self:drawNPCs()
@@ -153,7 +174,7 @@ function GameState:draw()
     self:drawCrosshairs()
     self:drawHUD()
     self:drawDialog()
-    self:drawMinimap()
+    --self:drawMinimap()
     --self:drawEditor()
     --self:drawInventory()
 end
@@ -261,10 +282,14 @@ end
 
 function GameState:drawHUD()
     love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.print(
-        'Gears: ' .. tostring(Player.player.gears),
-        20, 20
-    )
+    love.graphics.print('Gears: ' .. tostring(Player.player.gears), 20, 20)
+    love.graphics.print('Inventory:', 20, 36)
+    for i, item in ipairs(Player.player.items) do
+        love.graphics.print(
+            item,
+            20, 36 + i * 36
+        )
+    end
 end
 
 function GameState:drawDialog()
@@ -354,6 +379,18 @@ function GameState:drawTileMap()
                 end
             end
         end
+    end
+end
+
+function GameState:drawItemsOnGround()
+    for uuid, item in pairs(Item.currentItemSet) do
+        love.graphics.setColor(0, 0, 255, 255)
+        love.graphics.rectangle(
+            'fill',
+            item.x - G.ITEM_ON_FLOOR_SIZE / 2,
+            item.y - G.ITEM_ON_FLOOR_SIZE / 2,
+            G.ITEM_ON_FLOOR_SIZE, G.ITEM_ON_FLOOR_SIZE
+        )
     end
 end
 
@@ -542,6 +579,7 @@ for key, roomTemplate in pairs(Map:generateThisRunsRooms()) do
     Bullet:initializeRoom(key)
     Enemy:initializeRoom(key)
     Physics:initializeRoom(key)
+    Item:initializeRoom(key)
 
     Physics.worlds[key]:setCallbacks(nil, nil, nil, physicsPostSolve)
 
@@ -550,6 +588,9 @@ for key, roomTemplate in pairs(Map:generateThisRunsRooms()) do
     for i, enemyData in ipairs(roomTemplate.enemies) do
         local enemy = Enemy:build(key, enemyData)
         Physics:buildEnemy(key, enemy)
+    end
+    for i, itemData in ipairs(roomTemplate.items) do
+        Item:spawn(key, itemData)
     end
 
     Physics:buildPlayer(key, Player.player)
