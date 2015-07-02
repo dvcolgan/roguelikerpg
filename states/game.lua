@@ -59,6 +59,7 @@ end
 
 function GameState:onPhysicsPostSolve(a, b, coll)
     if a:isDestroyed() or b:isDestroyed() then
+        -- Note, why does this have to be here?  IS THERE BUG?
         print('returned early')
         return
     end
@@ -80,7 +81,6 @@ function GameState:onPhysicsPostSolve(a, b, coll)
     if Player:isPlayer(uuidB) then playerUuid = uuidB end
 
     if bulletUuid and enemyUuid then
-        print('bullet hit enemy')
         -- bullet hit enemy
         local enemyPhysics = Physics:get(enemyUuid)
         local gears = Gear:spawn(
@@ -95,12 +95,10 @@ function GameState:onPhysicsPostSolve(a, b, coll)
         Physics:remove(enemyUuid)
 
     elseif bulletUuid  then
-        print('bullet hit wall')
         Bullet:remove(bulletUuid)
         Physics:remove(bulletUuid)
 
     elseif gearUuid and playerUuid then
-        print('player hit gear')
         Gear:remove(gearUuid)
         Physics:remove(gearUuid)
         Player:collectGears(1)
@@ -128,7 +126,6 @@ function GameState:onKeyUp(key)
 end
 
 function GameState:onRoomChange(dCol, dRow, dFloor)
-    print('changing room')
     local playerPhysics = Physics:get(Player.player.uuid)
     if playerPhysics then
         playerPhysics.body:setLinearVelocity(0, 0)

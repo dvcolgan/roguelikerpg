@@ -66,7 +66,7 @@ function Physics:buildEnemy(key, enemy)
     enemyPhysics.fixture:setCategory(G.COLLISION.ENEMY)
     enemyPhysics.fixture:setMask(G.COLLISION.ENEMY, G.COLLISION.ENEMY_BULLET)
     enemyPhysics.fixture:setRestitution(0.2)
-    enemyPhysics.fixture:setUserData(uuid)
+    enemyPhysics.fixture:setUserData(enemy.uuid)
     objects[enemy.uuid] = enemyPhysics
 end
 
