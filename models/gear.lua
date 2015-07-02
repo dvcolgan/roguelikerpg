@@ -2,7 +2,8 @@ local util = require('util')
 
 
 local Gear = {}
-Gear.gears = {}
+Gear.gearSets = {}
+Gear.currentGearSet = {}
 
 function Gear:spawn(x, y, amount)
     local newGears = {}
@@ -13,22 +14,18 @@ function Gear:spawn(x, y, amount)
             x = x,
             y = y,
         }
-        self.gears[uuid] = gear
+        self.currentGearSet[uuid] = gear
         table.insert(newGears, gear)
     end
     return newGears
 end
 
 function Gear:remove(uuid)
-    self.gears[uuid] = nil
+    self.currentGearSet[uuid] = nil
 end
 
 function Gear:isGear(uuid)
-    return self.gears[uuid] ~= nil
-end
-
-function Gear:clear()
-    self.gears = {}
+    return self.currentGearSet[uuid] ~= nil
 end
 
 return Gear

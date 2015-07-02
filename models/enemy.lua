@@ -1,6 +1,7 @@
 local util = require('util')
 local G = require('constants')
 local vector = require('vector')
+local _ = require('moses')
 
 
 local Enemy = {}
@@ -33,11 +34,12 @@ function Enemy:build(key, enemyData)
         x = enemyData.col * G.TILE_SIZE + G.TILE_SIZE / 2,
         y = enemyData.row * G.TILE_SIZE + G.TILE_SIZE / 2,
         radius = enemyTemplate.radius,
-        hp = enemyTemplate.hp,
+        maxHealth = enemyTemplate.health,
+        health = enemyTemplate.health,
         name = enemyTemplate.name,
-        fireRate = enemyTemplate.fireRate,
-        damage = enemyTemplate.damage,
+        gears = enemyTemplate.gears,
         shotTime = 0,
+        items = _.clone(enemyTemplate.items),
     }
     enemies[enemy.uuid] = enemy
     return enemy
@@ -46,6 +48,8 @@ end
 function Enemy:tryFire(dtInSec, uuid, enemyPhysics, playerPhysics)
     local enemy = self.currentEnemySet[uuid]
     if enemy then
+        enemy.health = enemy.health - dtInSec
+        do return end
         enemy.shotTime = enemy.shotTime + dtInSec
         if enemy.shotTime >= enemy.fireRate then
             local targetX = playerPhysics.body:getX()

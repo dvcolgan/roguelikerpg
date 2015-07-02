@@ -1,5 +1,10 @@
-bugs:
-    if you shoot off the screen it crashes
+implement health for enemies and player
+draw the health bar
+allow picking up items with space
+allow items to modify your shot
+make enemies based on what items they have
+
+
 
 starts you with random items and in a random location on the ship at the beginning of the run
 

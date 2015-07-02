@@ -60,7 +60,6 @@ end
 function GameState:onPhysicsPostSolve(a, b, coll)
     if a:isDestroyed() or b:isDestroyed() then
         -- Note, why does this have to be here?  IS THERE BUG?
-        print('returned early')
         return
     end
     local uuidA = a:getUserData()
@@ -150,6 +149,7 @@ function GameState:draw()
     self:drawNPCs()
     self:drawEnemies()
     self:drawBullets()
+    self:drawHealthBars()
     self:drawCrosshairs()
     self:drawHUD()
     self:drawDialog()
@@ -160,7 +160,7 @@ end
 
 function GameState:drawGears()
     local gearImage = Asset.images.gear
-    for uuid, gear in pairs(Gear.gears) do
+    for uuid, gear in pairs(Gear.currentGearSet) do
         local gearPhysics = Physics:get(uuid)
         if gearPhysics then
             love.graphics.draw(
@@ -199,6 +199,59 @@ function GameState:drawEnemies()
                 enemyPhysics.body:getY(),
                 enemyPhysics.shape:getRadius(),
                 16
+            )
+        end
+    end
+end
+
+function HSV(h, s, v)
+    if s <= 0 then return v,v,v end
+    h, s, v = h/256*6, s/255, v/255
+    local c = v*s
+    local x = (1-math.abs((h%2)-1))*c
+    local m,r,g,b = (v-c), 0,0,0
+    if h < 1     then r,g,b = c,x,0
+    elseif h < 2 then r,g,b = x,c,0
+    elseif h < 3 then r,g,b = 0,c,x
+    elseif h < 4 then r,g,b = 0,x,c
+    elseif h < 5 then r,g,b = x,0,c
+    else              r,g,b = c,0,x
+    end return (r+m)*255,(g+m)*255,(b+m)*255
+end
+
+function GameState:drawHealthBars()
+    for uuid, enemy in pairs(Enemy.currentEnemySet) do
+        local enemyPhysics = Physics:get(uuid)
+        if enemyPhysics then
+            local drawX = enemyPhysics.body:getX() - G.HEALTH_BAR_WIDTH / 2
+            local drawY = enemyPhysics.body:getY() - G.HEALTH_BAR_WIDTH / 2
+
+            love.graphics.setColor(0, 0, 0, 255)
+            love.graphics.rectangle('fill',
+                drawX, drawY,
+                G.HEALTH_BAR_WIDTH,
+                G.HEALTH_BAR_HEIGHT
+            )
+            local healthPercent = enemy.health / enemy.maxHealth
+            --if healthPercent >= 0.66 then
+            --    love.graphics.setColor(0, 255, 0, 255)
+            --elseif healthPercent >= 0.33 then
+            --    love.graphics.setColor(255, 255, 0, 255)
+            --else
+            --    love.graphics.setColor(255, 0, 0, 255)
+            --end
+            --if healthPercent > 0.5 then
+            --    love.graphics.setColor(255 - 255 * healthPercent, 255, 0, 255)
+            --else
+            --    love.graphics.setColor(255, 255 * healthPercent, 0, 255)
+            --end
+            local r, g, b = HSV(85 * healthPercent, 255, 255)
+            love.graphics.setColor(r, g, b)
+            --love.graphics.setColor(255 - 255 * healthPercent, 255 * healthPercent, 125, 255)
+            love.graphics.rectangle('fill',
+                drawX, drawY,
+                G.HEALTH_BAR_WIDTH * healthPercent,
+                G.HEALTH_BAR_HEIGHT
             )
         end
     end
@@ -272,7 +325,7 @@ function GameState:drawPlayer()
 end
 
 function GameState:drawBullets()
-    for uuid, bullet in pairs(Bullet.bullets) do
+    for uuid, bullet in pairs(Bullet.currentBulletSet) do
         local bulletPhysics = Physics:get(uuid)
         if bulletPhysics then
             love.graphics.setColor(50, 50, 50, 255)
@@ -494,12 +547,14 @@ love.mouse.setVisible(false)
 Map:parseTileset(Asset.images.tilesheet)
 
 for key, roomTemplate in pairs(Map:generateThisRunsRooms()) do
+    Bullet:initializeRoom(key)
+    Enemy:initializeRoom(key)
     Physics:initializeRoom(key)
+
     Physics.worlds[key]:setCallbacks(nil, nil, nil, physicsPostSolve)
 
     Physics:buildRoom(key, roomTemplate.collision)
 
-    Enemy:initializeRoom(key)
     for i, enemyData in ipairs(roomTemplate.enemies) do
         local enemy = Enemy:build(key, enemyData)
         Physics:buildEnemy(key, enemy)

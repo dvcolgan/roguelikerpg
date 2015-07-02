@@ -1,0 +1,2 @@
+make only the player able to go offscreen
+give things momentum

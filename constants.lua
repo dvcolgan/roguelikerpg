@@ -1,4 +1,6 @@
 return {
+    HEALTH_BAR_WIDTH = 64,
+    HEALTH_BAR_HEIGHT = 8,
     TILE_SIZE = 64,
     EDITOR_TILE_SIZE = 32,
     ROOM_WIDTH = 15,
