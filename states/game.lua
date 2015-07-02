@@ -223,38 +223,30 @@ function GameState:drawHealthBars()
     for uuid, enemy in pairs(Enemy.currentEnemySet) do
         local enemyPhysics = Physics:get(uuid)
         if enemyPhysics then
-            local drawX = enemyPhysics.body:getX() - G.HEALTH_BAR_WIDTH / 2
-            local drawY = enemyPhysics.body:getY() - G.HEALTH_BAR_WIDTH / 2
-
-            love.graphics.setColor(0, 0, 0, 255)
-            love.graphics.rectangle('fill',
-                drawX, drawY,
-                G.HEALTH_BAR_WIDTH,
-                G.HEALTH_BAR_HEIGHT
-            )
-            local healthPercent = enemy.health / enemy.maxHealth
-            --if healthPercent >= 0.66 then
-            --    love.graphics.setColor(0, 255, 0, 255)
-            --elseif healthPercent >= 0.33 then
-            --    love.graphics.setColor(255, 255, 0, 255)
-            --else
-            --    love.graphics.setColor(255, 0, 0, 255)
-            --end
-            --if healthPercent > 0.5 then
-            --    love.graphics.setColor(255 - 255 * healthPercent, 255, 0, 255)
-            --else
-            --    love.graphics.setColor(255, 255 * healthPercent, 0, 255)
-            --end
-            local r, g, b = HSV(85 * healthPercent, 255, 255)
-            love.graphics.setColor(r, g, b)
-            --love.graphics.setColor(255 - 255 * healthPercent, 255 * healthPercent, 125, 255)
-            love.graphics.rectangle('fill',
-                drawX, drawY,
-                G.HEALTH_BAR_WIDTH * healthPercent,
-                G.HEALTH_BAR_HEIGHT
-            )
+            drawHealthBar(enemy, enemyPhysics)
         end
     end
+    drawHealthBar(Player.player, Physics:get(Player.player.uuid))
+end
+
+function drawHealthBar(object, physics)
+    local drawX = physics.body:getX() - G.HEALTH_BAR_WIDTH / 2
+    local drawY = physics.body:getY() - G.HEALTH_BAR_WIDTH / 2
+
+    love.graphics.setColor(0, 0, 0, 255)
+    love.graphics.rectangle('fill',
+        drawX, drawY,
+        G.HEALTH_BAR_WIDTH,
+        G.HEALTH_BAR_HEIGHT
+    )
+    local healthPercent = object.health / object.maxHealth
+    local r, g, b = HSV(85 * healthPercent, 255, 255)
+    love.graphics.setColor(r, g, b)
+    love.graphics.rectangle('fill',
+        drawX, drawY,
+        G.HEALTH_BAR_WIDTH * healthPercent,
+        G.HEALTH_BAR_HEIGHT
+    )
 end
 
 function GameState:drawCrosshairs()

@@ -15,6 +15,9 @@ Player.player = {
     frozen = false,
     damage = 10,
     gears = 0,
+
+    health = 100,
+    maxHealth = 100,
 }
 
 function Player:pause()
