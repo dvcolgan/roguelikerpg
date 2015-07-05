@@ -13,7 +13,9 @@ function GameState:init(images)
         parts.Circle(300, 300, 32),
         parts.Command(300, 400),
         parts.Connector1x1(350, 400),
-        parts.Connector2x1(250, 400)
+        parts.Connector2x1(250, 400),
+        parts.Cannon(450, 400),
+        parts.Thruster(150, 400)
     )
 end
 

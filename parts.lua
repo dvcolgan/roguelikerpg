@@ -105,8 +105,8 @@ function Connector2x1:init(x, y)
     self.image = 'connector2x1'
 end
 
-local Circle = class('Circle')
-function Circle:init(x, y, radius)
+local Cannon = class('Cannon')
+function Cannon:init(x, y)
     self.uuid = util.uuid()
     self.position = {
         x = x,
@@ -114,15 +114,26 @@ function Circle:init(x, y, radius)
     }
     self.shape = {
         kind = 'circle',
-        radius = radius,
-    }
-    self.color = {
-        red = 0,
-        green = 255,
-        blue = 0,
-        alpha = 255,
+        radius = 24,
     }
     self.physics = true
+    self.image = 'cannon'
+end
+
+local Thruster = class('Thruster')
+function Thruster:init(x, y)
+    self.uuid = util.uuid()
+    self.position = {
+        x = x,
+        y = y,
+    }
+    self.shape = {
+        kind = 'rectangle',
+        width = 40,
+        height = 40,
+    }
+    self.physics = true
+    self.image = 'thruster'
 end
 
 return {
@@ -131,4 +142,6 @@ return {
     Command = Command,
     Connector1x1 = Connector1x1,
     Connector2x1 = Connector2x1,
+    Cannon = Cannon,
+    Thruster = Thruster,
 }
