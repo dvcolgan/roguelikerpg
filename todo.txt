@@ -1,4 +1,81 @@
-allow picking up items with space
+class Command
+    has many parts
+    stats for the whole
+
+class Part
+    has many joints
+    has physics body
+
+class Joint
+    strength
+
+a part needs:
+    physics body
+    physics shape
+    physics fixture
+    graphic
+    strength
+
+parts connected by joints
+
+
+part
+
+joint
+    box2d joint
+    strength
+
+command
+
+
+
+
+
+player starts with a command module and maybe one gun
+as you defeat enemies, they drop parts and gears
+you can buy parts with gears
+you can also scavenge parts that fall off of enemies
+enemies are made up of the exact same parts as you
+
+you assign every functioning thing to a keyboard key
+
+the parts you pick up have memory logs that contribute to the story
+figure out why you are on the ship
+why the ship is exploding
+why the ship is a prison ship
+The different parts of the ship could have different kinds of logs, and different kinds of parts
+
+easy and advanced controls
+potentially upgrade existing parts
+
+if this is a prison ship in space
+    the inmates could still sell you parts
+    other inmates can upgrade parts with gears
+    inmates also give story elements
+
+todo:
+    have parts on the ground
+    implement gluing on parts with the mouse
+    implement assigning a key to some pieces to fire
+    create parts:
+        square with 4 mount points
+        cannon with one mount point and opposite opening
+
+
+
+
+
+
+
+
+
+
+
+
+hold down fire to increase accuracy
+move curser further away to increase accuracy
+
+
 allow items to modify your shot
 make enemies based on what items they have
 

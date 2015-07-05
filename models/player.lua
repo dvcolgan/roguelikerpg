@@ -11,14 +11,15 @@ Player.player = {
     direction = 'left',
     acceleration = 1000,
     drag = 30,
-    maxSpeed = 3,
     frozen = false,
     damage = 10,
     gears = 0,
 
     health = 100,
     maxHealth = 100,
-    items = {},
+    items = {
+        'pinCannon',
+    },
 }
 
 function Player:pause()
@@ -46,25 +47,6 @@ end
 
 function Player:collectGears(number)
     self.player.gears = self.player.gears + number
-end
-
-function Player:createBullet(playerPhysics, targetX, targetY)
-    if playerPhysics then
-        local playerX = playerPhysics.body:getX()
-        local playerY = playerPhysics.body:getY()
-        local angle = math.atan2(
-            targetY - playerY,
-            targetX - playerX
-        )
-
-        return {
-            damage = self.player.damage,
-            x = playerX,
-            y = playerY,
-            angle = angle,
-            category = G.COLLISION.PLAYER_BULLET,
-        }
-    end
 end
 
 return Player

@@ -112,24 +112,21 @@ function Physics:positionPlayerOnRoomEnter(key, player, playerPhysics, map)
 end
 
 
-function Physics:buildAndFireBullet(bullet)
+function Physics:buildBullet(bullet)
     local bulletPhysics = {}
-    bulletPhysics.body = love.physics.newBody(self.currentWorld, bullet.x, bullet.y, 'dynamic')
-    bulletPhysics.body:setX(bullet.x)
-    bulletPhysics.body:setY(bullet.y)
-    bulletPhysics.shape = love.physics.newCircleShape(bullet.damage)
+    bulletPhysics.body = love.physics.newBody(self.currentWorld, bullet.startX, bullet.startY, 'dynamic')
+    bulletPhysics.shape = love.physics.newCircleShape(bullet.size)
     bulletPhysics.fixture = love.physics.newFixture(bulletPhysics.body, bulletPhysics.shape, 1)
-    bulletPhysics.fixture:setRestitution(0.3)
+    --bulletPhysics.fixture:setRestitution(0.3)
     bulletPhysics.fixture:setCategory(bullet.category)
     bulletPhysics.fixture:setUserData(bullet.uuid)
-    if bullet.category == G.COLLISION.PLAYER_BULLET then
-        bulletPhysics.fixture:setMask(G.COLLISION.ENEMY_BULLET)
-    else
-        bulletPhysics.fixture:setMask(G.COLLISION.PLAYER_BULLET, G.COLLISION.ENEMY_BULLET)
-    end
-    local force = 2000
-    local fx = force * math.cos(bullet.angle)
-    local fy = force * math.sin(bullet.angle)
+    --if bullet.category == G.COLLISION.PLAYER_BULLET then
+    --    bulletPhysics.fixture:setMask(G.COLLISION.ENEMY_BULLET, G.COLLISION,)
+    --else
+    --end
+    bulletPhysics.fixture:setMask(G.COLLISION.PLAYER_BULLET, G.COLLISION.ENEMY_BULLET)
+    local fx = bullet.force * math.cos(bullet.angle)
+    local fy = bullet.force * math.sin(bullet.angle)
     bulletPhysics.body:applyForce(fx, fy)
     self.currentObjects[bullet.uuid] = bulletPhysics
 end

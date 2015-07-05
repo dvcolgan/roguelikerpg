@@ -1,4 +1,5 @@
 local util = require('util')
+local vector = require('vector')
 local G = require('constants')
 
 local Asset = require('models/asset')
@@ -106,13 +107,26 @@ end
 
 function GameState:onMouseDown(mouseX, mouseY, button)
     if button == 'l' then
-        local bulletSpec = Player:createBullet(
-            Physics:get(Player.player.uuid),
-            mouseX,
-            mouseY
-        )
-        local bullet = Bullet:fire(bulletSpec)
-        Physics:buildAndFireBullet(bullet)
+        local playerPhysics = Physics:get(Player.player.uuid)
+
+        local bulletX = playerPhysics.body:getX()
+        local bulletY = playerPhysics.body:getY()
+
+        local bulletAngle  = math.atan2(mouseY - bulletY, mouseX - bulletX)
+
+        for i, itemKey in ipairs(Player.player.items) do
+            local itemStats = Item.itemTemplates[itemKey]
+
+            local bullet = Bullet:build({
+                startX = bulletX,
+                startY = bulletY,
+                angle = bulletAngle + math.random() * math.pi / 8 - math.pi / 16,
+                force = itemStats.power,
+                size = itemStats.size,
+                category = G.COLLISION.PLAYER_BULLET,
+            })
+            Physics:buildBullet(bullet)
+        end
     end
 end
 
@@ -174,12 +188,13 @@ function GameState:draw()
     self:drawCrosshairs()
     self:drawHUD()
     self:drawDialog()
-    --self:drawMinimap()
+    self:drawMinimap()
     --self:drawEditor()
     --self:drawInventory()
 end
 
 function GameState:drawGears()
+    love.graphics.setColor(255, 255, 255, 255)
     local gearImage = Asset.images.gear
     for uuid, gear in pairs(Gear.currentGearSet) do
         local gearPhysics = Physics:get(uuid)
@@ -270,13 +285,53 @@ function drawHealthBar(object, physics)
     )
 end
 
+function lerp(a,b,t) return (1-t)*a + t*b end
+
+function calculateSpread(startX, startY, endX, endY)
+end
+
 function GameState:drawCrosshairs()
     local image = Asset.images.crosshairs
+    local playerPhysics = Physics:get(Player.player.uuid)
+    local startX = playerPhysics.body:getX()
+    local startY = playerPhysics.body:getY()
+    local mouseX = love.mouse.getX()
+    local mouseY = love.mouse.getY()
+
     love.graphics.setColor(255, 255, 255, 255)
     love.graphics.draw(
         Asset.images.crosshairs,
-        love.mouse.getX() - image:getWidth() / 2,
-        love.mouse.getY() - image:getHeight() / 2
+         mouseX - image:getWidth() / 2,
+         mouseY - image:getHeight() / 2
+    )
+
+    local bulletAngle  = math.deg(math.atan2(mouseY - startY, mouseX - startX))
+    local dist = vector.dist(startX, startY, mouseX, mouseY)
+
+    local angleFactor = dist / 600
+    if angleFactor > 1 then angleFactor = 1 end
+    local angle = lerp(80, 0, angleFactor)
+
+    print(angleFactor)
+
+    local leftAngle = bulletAngle - angle
+    local rightAngle = bulletAngle + angle
+    --print(leftAngle, rightAngle)
+
+    -- at dist == 0, spread = 160
+    -- at dist == infinity, spread = 0
+
+    love.graphics.line(
+        startX,
+        startY,
+        startX + dist * math.cos(math.rad(leftAngle)),
+        startY + dist * math.sin(math.rad(leftAngle))
+    )
+    love.graphics.line(
+        startX,
+        startY,
+        startX + dist * math.cos(math.rad(rightAngle)),
+        startY + dist * math.sin(math.rad(rightAngle))
     )
 end
 

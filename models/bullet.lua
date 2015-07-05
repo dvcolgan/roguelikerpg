@@ -22,16 +22,9 @@ function Bullet:isBullet(uuid)
     return self.currentBulletSet[uuid] ~= nil
 end
 
-function Bullet:fire(bulletSpec)
-    local bullet = {
-        uuid = util.uuid(),
-        x = bulletSpec.x,
-        y = bulletSpec.y,
-        angle = bulletSpec.angle,
-        timeout = 3,
-        damage = bulletSpec.damage,
-        category = bulletSpec.category,
-    }
+function Bullet:build(bullet)
+    bullet.uuid = util.uuid()
+    bullet.timeout = 3
     self.currentBulletSet[bullet.uuid] = bullet
     return bullet
 end

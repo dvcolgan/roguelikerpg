@@ -50,7 +50,6 @@ end
 function Map:chooseRandomRoom(roomType)
     local roomsOfType = self.roomTemplates[roomType]
     local index = math.random(#roomsOfType)
-    index = 1
     return roomsOfType[index], index
 end
 

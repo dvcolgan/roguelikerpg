@@ -26,12 +26,12 @@ end
 
 function Item:spawn(key, itemData)
     local items = self.itemSets[key]
-    local itemTemplate = self.itemTemplates[itemData.key]
-    local item = _.clone(itemTemplate)
-    item.uuid = util.uuid()
-    item.key = itemData.key
-    item.x = itemData.col * G.TILE_SIZE + G.TILE_SIZE / 2
-    item.y = itemData.row * G.TILE_SIZE + G.TILE_SIZE / 2
+    item = {
+        uuid = util.uuid(),
+        key = itemData.key,
+        x = itemData.col * G.TILE_SIZE + G.TILE_SIZE / 2,
+        y = itemData.row * G.TILE_SIZE + G.TILE_SIZE / 2,
+    }
     items[item.uuid] = item
     return item
 end
@@ -44,7 +44,6 @@ function Item:pickUp(pickUpperX, pickUpperY)
             item.x, item.y,
             pickUpperX, pickUpperY
         )
-        print(dist)
         if dist < G.ITEM_PICKUP_DIST then
             if closestItem == nil or dist < closestDist then
                 closestItem = item
