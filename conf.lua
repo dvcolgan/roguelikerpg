@@ -1,6 +1,10 @@
 function love.conf(t)
+
     io.stdout:setvbuf("no")
+    _G.class = require('30log')
     table.inspect = require('inspect')
+    math.randomseed(os.time())
+
     t.identity = "roguelike"
     t.version = "0.9.2"
     t.console = false
