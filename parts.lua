@@ -83,6 +83,9 @@ function Cannon:init(x, y)
         width = 40,
         height = 40,
     }
+    self.connections = {
+        {0, 0.5}, -- left
+    }
     self.physics = true
     self.image = 'cannon'
     self.isPart = true
@@ -98,6 +101,9 @@ function Thruster:init(x, y)
     self.shape = {
         kind = 'circle',
         radius = 24,
+    }
+    self.connections = {
+        {0, 0.5}, -- left
     }
     self.physics = true
     self.image = 'thruster'

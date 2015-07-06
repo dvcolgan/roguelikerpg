@@ -1,6 +1,8 @@
 local ecs = require('tiny')
 local util = require('util')
 local vector = require('vector')
+local G = require('constants')
+local debugWorldDraw = require('physics-debugdraw')
 
 local Box2DSystem = ecs.processingSystem(class 'Box2DSystem')
 
@@ -35,6 +37,16 @@ function Box2DSystem:onAdd(entity)
     object.fixture = love.physics.newFixture(object.body, object.shape, 1)
     object.fixture:setRestitution(0.2)
     object.fixture:setUserData(entity)
+
+    if entity.connections then
+        object.connections = {}
+
+        for i, conTemplate in ipairs(entity.connections) do
+            local connection = {}
+            connection.shape = love.physics.newCircleShape(G.CONNECTION_RADIUS)
+            connection.fixture = love.physics.newFixture(object.body, connection.shape, 1)
+        end
+    end
 
     self.objects[entity.uuid] = object
 end
@@ -91,12 +103,6 @@ function Box2DSystem:pinClosestConnection()
                         height * connection[2] - height / 2
                     )
 
-                    love.graphics.setColor(255, 255, 0, 255)
-                    love.graphics.circle(
-                        'fill',
-                        connectionX, connectionY, 4, 10
-                    )
-
                     local dist = vector.dist(
                         connectionX, connectionY, mouseX, mouseY
                     )
@@ -131,12 +137,6 @@ function Box2DSystem:preProcess(dt)
 
     if self.mouseJoint then
         self.mouseJoint:setTarget(love.mouse.getPosition())
-        local _, _, x, y = self.mouseJoint:getAnchors()
-        love.graphics.setColor(255, 255, 0, 255)
-        love.graphics.circle(
-            'fill',
-            x, y, 4, 10
-        )
     end
     self.physics:update(dt)
 end
@@ -146,6 +146,11 @@ function Box2DSystem:process(entity, dt)
     entity.position.x = object.body:getX()
     entity.position.y = object.body:getY()
     entity.position.angle = object.body:getAngle()
+end
+
+function Box2DSystem:postProcess(dt)
+    love.graphics.setColor(255, 255, 255)
+    debugWorldDraw(self.physics, 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
 end
 
 return Box2DSystem

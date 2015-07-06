@@ -15,7 +15,7 @@ function GameState:init(images)
         parts.Cannon(450, 400),
         parts.Thruster(150, 400)
     )
-    --love.graphics.setBackgroundColor(255, 255, 255, 255)
+    love.graphics.setBackgroundColor(255, 255, 255, 255)
 end
 
 function GameState:draw()

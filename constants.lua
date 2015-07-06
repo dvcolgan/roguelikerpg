@@ -1,4 +1,6 @@
 return {
+    CONNECTION_RADIUS = 8,
+
     HEALTH_BAR_WIDTH = 64,
     HEALTH_BAR_HEIGHT = 8,
     TILE_SIZE = 64,
