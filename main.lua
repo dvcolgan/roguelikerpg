@@ -19,9 +19,7 @@ function love.load()
 end
 
 function love.draw()
-    if game.state.draw then
-        game.state:draw() 
-    end
+    if game.state.draw then game.state:draw() end
 end
 
 function love.update(dt)

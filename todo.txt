@@ -29,6 +29,7 @@ command
 
 
 
+day/night cycle
 
 
 player starts with a command module and maybe one gun

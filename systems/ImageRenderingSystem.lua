@@ -13,10 +13,16 @@ end
 
 function ImageRenderingSystem:process(entity, dt)
     local image = self.images[entity.image]
-    love.graphics.draw(image,
-        math.floor(entity.position.x - image:getWidth() / 2),
-        math.floor(entity.position.y - image:getHeight() / 2)
-    )
+    local drawX = entity.position.x
+    local drawY = entity.position.y
+    local offsetX = math.floor(image:getWidth() / 2)
+    local offsetY = math.floor(image:getHeight() / 2)
+
+    if entity.position.angle then
+        love.graphics.draw(image, drawX, drawY, entity.position.angle, 1, 1, offsetX, offsetY)
+    else
+        love.graphics.draw(image, drawX, drawY, 0, 1, 1, offsetX, offsetY)
+    end
 end
 
 return ImageRenderingSystem

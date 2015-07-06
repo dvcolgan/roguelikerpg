@@ -1,10 +1,13 @@
 local ecs = require('tiny')
 local util = require('util')
+local vector = require('vector')
 
 local Box2DSystem = ecs.processingSystem(class 'Box2DSystem')
 
 function Box2DSystem:init()
     self.objects = {}
+    self.mouseJoint = nil
+    self.mouseDown = false
     self.physics = love.physics.newWorld(0, 0, true)
     self.filter = ecs.requireAll('uuid', 'physics', 'position', 'shape')
     self:buildWalls()
@@ -60,7 +63,81 @@ function Box2DSystem:buildWalls()
     end
 end
 
+function Box2DSystem:releaseMouseJoint()
+    if self.mouseJoint then
+        self.mouseJoint:destroy()
+        self.mouseJoint = nil
+    end
+end
+
+function Box2DSystem:pinClosestConnection()
+    local closestObject = nil
+    local closestDist = nil
+    local connectionIdx = nil
+    local mouseX, mouseY = love.mouse.getPosition()
+    local closestConnectionX = nil
+    local closestConnectionY = nil
+
+    for uuid, object in pairs(self.objects) do
+        local entity = object.fixture:getUserData()
+        if entity then
+            if entity.connections and entity.shape and entity.position then
+                for i, connection in ipairs(entity.connections) do
+                    local width = entity.shape.width or entity.shape.radius * 2
+                    local height = entity.shape.height or entity.shape.radius * 2
+
+                    local connectionX, connectionY = object.body:getWorldPoint(
+                        width * connection[1] - width / 2,
+                        height * connection[2] - height / 2
+                    )
+
+                    love.graphics.setColor(255, 255, 0, 255)
+                    love.graphics.circle(
+                        'fill',
+                        connectionX, connectionY, 4, 10
+                    )
+
+                    local dist = vector.dist(
+                        connectionX, connectionY, mouseX, mouseY
+                    )
+                    if closestDist == nil or dist < closestDist then
+                        closestObject = object
+                        closestDist = dist
+                        connectionIdx = i
+                        closestConnectionX = connectionX
+                        closestConnectionY = connectionY
+                    end
+                end
+            end
+        end
+    end
+
+    if closestObject then
+        self.mouseJoint = love.physics.newMouseJoint(
+            closestObject.body, closestConnectionX, closestConnectionY
+        )
+    end
+end
+
 function Box2DSystem:preProcess(dt)
+    if not self.mouseDown and love.mouse.isDown('l') then
+        self.mouseDown = true
+        self:pinClosestConnection()
+
+    elseif self.mouseDown and not love.mouse.isDown('l') then
+        self.mouseDown = false
+        self:releaseMouseJoint()
+    end
+
+    if self.mouseJoint then
+        self.mouseJoint:setTarget(love.mouse.getPosition())
+        local _, _, x, y = self.mouseJoint:getAnchors()
+        love.graphics.setColor(255, 255, 0, 255)
+        love.graphics.circle(
+            'fill',
+            x, y, 4, 10
+        )
+    end
     self.physics:update(dt)
 end
 
@@ -68,6 +145,7 @@ function Box2DSystem:process(entity, dt)
     local object = self.objects[entity.uuid]
     entity.position.x = object.body:getX()
     entity.position.y = object.body:getY()
+    entity.position.angle = object.body:getAngle()
 end
 
 return Box2DSystem

@@ -9,17 +9,17 @@ function GameState:init(images)
         require('systems.ImageRenderingSystem')(images),
         require('systems.Box2DSystem')(),
 
-        parts.Square(400, 300, 64, 64),
-        parts.Circle(300, 300, 32),
         parts.Command(300, 400),
         parts.Connector1x1(350, 400),
         parts.Connector2x1(250, 400),
         parts.Cannon(450, 400),
         parts.Thruster(150, 400)
     )
+    --love.graphics.setBackgroundColor(255, 255, 255, 255)
 end
 
 function GameState:draw()
+    love.graphics.clear()
     local dt = love.timer.getDelta()
     self.world:update(dt)
 end
