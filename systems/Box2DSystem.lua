@@ -43,8 +43,14 @@ function Box2DSystem:onAdd(entity)
 
         for i, conTemplate in ipairs(entity.connections) do
             local connection = {}
-            connection.shape = love.physics.newCircleShape(G.CONNECTION_RADIUS)
+            local width = entity.shape.width or entity.shape.radius * 2
+            local height = entity.shape.height or entity.shape.radius * 2
+            local offsetX = width * conTemplate[1] - width / 2
+            local offsetY = height * conTemplate[2] - height / 2
+            connection.shape = love.physics.newCircleShape(offsetX, offsetY, G.CONNECTION_RADIUS)
             connection.fixture = love.physics.newFixture(object.body, connection.shape, 1)
+            connection.fixture:setSensor(true)
+            table.insert(object.connections, connection)
         end
     end
 
@@ -122,6 +128,22 @@ function Box2DSystem:pinClosestConnection()
         self.mouseJoint = love.physics.newMouseJoint(
             closestObject.body, closestConnectionX, closestConnectionY
         )
+        self.mouseJoint:setUserData(closestObject)
+    end
+end
+
+function Box2DSystem:weldToNearbyParts(object)
+    local objectUuid = object:getUserData().uuid
+    for uuid, otherObject in pairs(self.objects) do
+        if objectUuid ~= uuid then
+            local dist = vector.dist(
+                object.body:getX(),
+                object.body:getY(),
+                otherObject.body:getX(),
+                otherObject.body:getY()
+            )
+            print(dist)
+        end
     end
 end
 
@@ -132,6 +154,12 @@ function Box2DSystem:preProcess(dt)
 
     elseif self.mouseDown and not love.mouse.isDown('l') then
         self.mouseDown = false
+
+        -- weld mouse joint's connection and anything else it is overlapping with
+
+        local pinnedObject = self.mouseJoint.fixture:getUserData()
+        self:weldToNearbyParts(pinnedObject)
+
         self:releaseMouseJoint()
     end
 
@@ -150,7 +178,7 @@ end
 
 function Box2DSystem:postProcess(dt)
     love.graphics.setColor(255, 255, 255)
-    debugWorldDraw(self.physics, 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+    --debugWorldDraw(self.physics, 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
 end
 
 return Box2DSystem
