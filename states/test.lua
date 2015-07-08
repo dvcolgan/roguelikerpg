@@ -18,12 +18,12 @@ function GameState:init()
         require('systems.MountPointDragSystem')(),
 
         parts.Command(300, 400),
-        parts.Command(400, 400),
-        parts.Command(500, 400)
-        --parts.Connector1x1(350, 400),
-        --parts.Connector2x1(250, 400),
-        --parts.Cannon(450, 400),
-        --parts.Thruster(150, 400)
+        parts.Connector1x1(350, 400),
+        parts.Connector1x1(350, 400),
+        parts.Cannon(450, 400),
+        parts.Cannon(450, 400),
+        parts.Thruster(150, 400),
+        parts.Thruster(150, 400)
     )
 
     love.graphics.setBackgroundColor(255, 255, 255, 255)

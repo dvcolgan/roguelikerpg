@@ -81,12 +81,12 @@ function Connector2x1:init(x, y)
     }
     self.physics = true
     self.mountPoints = {
-        MountPoint(-44, 0), -- left
-        MountPoint(44, 0), -- right
-        MountPoint(-11, 0), -- top
-        MountPoint(0.23, -22), -- bottom
-        MountPoint(0.77, 0), -- top
-        MountPoint(0.77, 1), -- bottom
+        MountPoint(self, -44, 0), -- left
+        MountPoint(self, 44, 0), -- right
+        MountPoint(self, -11, 0), -- top
+        MountPoint(self, 0.23, -22), -- bottom
+        MountPoint(self, 0.77, 0), -- top
+        MountPoint(self, 0.77, 1), -- bottom
     }
     self.image = 'connector2x1'
     self.isPart = true
@@ -106,7 +106,7 @@ function Cannon:init(x, y)
         height = 40,
     }
     self.mountPoints = {
-        MountPoint(0, 0.5), -- left
+        MountPoint(self, -24, 0), -- left
     }
     self.physics = true
     self.image = 'cannon'
@@ -126,7 +126,7 @@ function Thruster:init(x, y)
         radius = 24,
     }
     self.mountPoints = {
-        MountPoint(0, 0.5), -- left
+        MountPoint(self, -24, 0), -- left
     }
     self.physics = true
     self.image = 'thruster'
