@@ -9,30 +9,27 @@ function GameState:init()
     _G.world = ecs.world()
 
     world:add(
-        require('systems.ShapeRenderingSystem')(),
         require('systems.ImageRenderingSystem')(),
         require('systems.WallSystem')(),
         require('systems.MouseJointSystem')(),
         require('systems.PositionSystem')(),
         require('systems.ConnectionSystem')(),
         require('systems.MountPointDragSystem')(),
-
-        parts.Player(350, 400),
-        parts.Enemy(300, 400),
-        parts.Connector1x1(350, 400),
-        parts.Connector1x1(350, 400),
-        parts.Cannon(450, 400),
-        parts.Cannon(450, 400),
-        parts.Thruster(150, 400),
-        parts.Thruster(150, 400)
+        require('systems.EditorPartSpawnerSystem')()
     )
 
     love.graphics.setBackgroundColor(255, 255, 255, 255)
 end
 
 function GameState:draw()
-    love.graphics.clear()
+    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.draw(
+        assets.images.editorBackground,
+        assets.images.editorBackgroundQuad,
+        0, 0
+    )
     world:update(love.timer.getDelta())
 end
 
 return GameState
+

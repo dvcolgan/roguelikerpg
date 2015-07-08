@@ -17,8 +17,8 @@ function MountPoint:getWorldPosition()
     return object.body:getWorldPoint(self.position.x, self.position.y)
 end
 
-local Command = class('Command')
-function Command:init(x, y)
+local Player = class('Player')
+function Player:init(x, y)
     self.uuid = util.uuid()
     self.position = {
         x = x,
@@ -36,7 +36,33 @@ function Command:init(x, y)
         MountPoint(self, 0, -24), -- top
         MountPoint(self, 0, 24), -- bottom
     }
-    self.image = 'command'
+    self.image = 'player'
+    self.isPart = true
+
+    self.selected = true
+    world:addEntity(self)
+end
+
+local Enemy = class('Enemy')
+function Enemy:init(x, y)
+    self.uuid = util.uuid()
+    self.position = {
+        x = x,
+        y = y,
+    }
+    self.angle = 0
+    self.shape = {
+        kind = 'circle',
+        radius = 21,
+    }
+    self.physics = true
+    self.mountPoints = {
+        MountPoint(self, -24, 0), -- left
+        MountPoint(self, 24, 0), -- right
+        MountPoint(self, 0, -24), -- top
+        MountPoint(self, 0, 24), -- bottom
+    }
+    self.image = 'enemy'
     self.isPart = true
 
     self.selected = true
@@ -137,7 +163,8 @@ end
 return {
     Square = Square,
     Circle = Circle,
-    Command = Command,
+    Player = Player,
+    Enemy = Enemy,
     Connector1x1 = Connector1x1,
     Connector2x1 = Connector2x1,
     Cannon = Cannon,
