@@ -2,8 +2,7 @@ local ecs = require('tiny')
 
 local ImageRenderingSystem = ecs.processingSystem(class 'ImageRenderingSystem')
 
-function ImageRenderingSystem:init(images)
-    self.images = images
+function ImageRenderingSystem:init()
     self.filter = ecs.requireAll('position', 'image')
 end
 
@@ -12,7 +11,7 @@ function ImageRenderingSystem:preProcess()
 end
 
 function ImageRenderingSystem:process(entity, dt)
-    local image = self.images[entity.image]
+    local image = assets.images[entity.image]
     local drawX = entity.position.x
     local drawY = entity.position.y
     local offsetX = math.floor(image:getWidth() / 2)

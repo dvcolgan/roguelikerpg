@@ -3,8 +3,12 @@ local game = {
     state = nil,
 }
 
+_G.assets = {
+    images = {}
+}
+
 function love.load()
-    game.images = {
+    assets.images = {
         gear = love.graphics.newImage('assets/gear.png'),
         crosshairs = love.graphics.newImage('assets/crosshairs.png'),
         tilesheet = love.graphics.newImage('assets/tilesheet.png'),
@@ -15,7 +19,7 @@ function love.load()
         cannon = love.graphics.newImage('assets/cannon.png'),
         thruster = love.graphics.newImage('assets/thruster.png'),
     }
-    game.state = require('states/test')(game.images)
+    game.state = require('states/test')()
 end
 
 function love.draw()
