@@ -13,11 +13,13 @@ function GameState:init()
         require('systems.WallSystem')(),
         require('systems.MouseJointSystem')(),
         require('systems.PositionSystem')(),
-        require('systems.ConnectionSystem')(),
         require('systems.MountPointDragSystem')(),
-        require('systems.EditorPartSpawnerSystem')()
+        require('systems.EditorPartSpawnerSystem')(),
+        require('systems.EditorEntitySaverSystem')(),
+        require('systems.ConnectionSystem')()
     )
 
+    local prefabs = require('prefabs')
     love.graphics.setBackgroundColor(255, 255, 255, 255)
 end
 

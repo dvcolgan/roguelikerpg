@@ -1,31 +1,36 @@
-local GameState = class('GameState')
 local ecs = require('tiny')
 local PhysicsManager = require('physics-manager')
-
 local parts = require('parts')
+
+local GameState = class('GameState')
+local box2DSystems = require('systems/Box2DSystems')
+local mouseDragSystems = require('systems/MouseDragSystems')
 
 function GameState:init()
     _G.physics = PhysicsManager()
     _G.world = ecs.world()
 
     world:add(
-        require('systems.ShapeRenderingSystem')(),
+        box2DSystems.RevoluteJointSystem(),
+        box2DSystems.MouseJointSystem(),
+        box2DSystems.RigidBodySystem(),
+
+        mouseDragSystems.MouseDragSystem(),
+        mouseDragSystems.MouseDragReleaseSystem(),
+
+        require('systems.PartWeldingSystem')(),
         require('systems.ImageRenderingSystem')(),
         require('systems.WallSystem')(),
-        require('systems.MouseJointSystem')(),
-        require('systems.PositionSystem')(),
-        require('systems.ConnectionSystem')(),
-        require('systems.MountPointDragSystem')(),
+    nil)
 
-        parts.Player(350, 400),
-        parts.Enemy(300, 400),
-        parts.Connector1x1(350, 400),
-        parts.Connector1x1(350, 400),
-        parts.Cannon(450, 400),
-        parts.Cannon(450, 400),
-        parts.Thruster(150, 400),
-        parts.Thruster(150, 400)
-    )
+    parts.Player(350, 400)
+    parts.Enemy(300, 400)
+    parts.Connector1x1(350, 400)
+    parts.Connector1x1(350, 400)
+    parts.Cannon(450, 400)
+    parts.Cannon(450, 400)
+    parts.Thruster(150, 400)
+    parts.Thruster(150, 400)
 
     love.graphics.setBackgroundColor(255, 255, 255, 255)
 end

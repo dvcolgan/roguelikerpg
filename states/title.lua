@@ -1,8 +1,7 @@
 local class = require('middleclass')
-local GameState = require('lib/state')
+local beholder = require('beholder')
 
-
-local TitleState = class('TitleState', GameState)
+local TitleState = class('TitleState')
 
 function TitleState:create()
     self.speed=300

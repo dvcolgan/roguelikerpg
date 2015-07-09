@@ -1,3 +1,7 @@
+if an enemy dies, all of the parts become loose
+    if you punch a part it turns into gears
+
+
 class Command
     has many parts
     stats for the whole

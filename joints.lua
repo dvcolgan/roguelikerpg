@@ -1,10 +1,10 @@
 local util = require('util')
 
-local MouseJoint = class('MouseJoint')
-function MouseJoint:init(mountPoint1)
+local Dragging = class('Dragging')
+function Dragging:init(dragged)
     self.uuid = util.uuid()
-    self.mountPoint1 = mountPoint1
-    self.mountPoint2 = 'mouse'
+    self.dragged = dragged
+    self.dragging = true
     world:addEntity(self)
 end
 
@@ -17,6 +17,6 @@ function Connection:init(mountPoint1, mountPoint2)
 end
 
 return {
-    MouseJoint = MouseJoint,
+    Dragging = Dragging,
     Connection = Connection,
 }
