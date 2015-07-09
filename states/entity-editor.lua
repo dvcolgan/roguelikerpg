@@ -33,7 +33,8 @@ function GameState:init()
 
     nil)
 
-    factories.buildActor(enemies.drone)
+    factories.buildActor(enemies.drone, 400, 300)
+    factories.buildActor(enemies.drone, 200, 100)
 
     love.graphics.setBackgroundColor(255, 255, 255, 255)
 end

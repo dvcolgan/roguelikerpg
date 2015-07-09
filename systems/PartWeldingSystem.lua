@@ -23,7 +23,9 @@ function PartWeldingSystem:onRemove(dragging)
                         mountX, mountY, otherMountX, otherMountY
                     )
                     if dist < G.CONNECTION_RADIUS then
-                        joints.Connection(dragging.dragged, mountPoint)
+                        local connection = joints.Connection(dragging.dragged, mountPoint)
+                        dragging.dragged.connection = connection
+                        mountPoint.connection = connection
                     end
                 end
             end

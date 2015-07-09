@@ -1,5 +1,6 @@
 local ecs = require('tiny')
 local beholder = require('beholder')
+local parts = require('parts')
 local G = require('constants')
 
 local EntityDeleteSystem = ecs.processingSystem(class('EntityDeleteSystem'))
@@ -25,14 +26,13 @@ function EntitySaverSystem:init()
             local unhandledParts = {}
             local handledParts = {}
 
-            function savePart(part)
-                print(part.name)
+            function savePart(part, offsetX, offsetY)
                 handledParts[part] = true
                 local partData = {
                     name = part.name,
-                    x = part.position.x,
-                    y = part.position.y,
-                    angle = part.position.angle,
+                    x = part.transform.x - offsetX,
+                    y = part.transform.y - offsetY,
+                    angle = part.transform.angle,
                     connections = {}
                 }
                 for i, mountPoint in ipairs(part.mountPoints) do
@@ -48,7 +48,7 @@ function EntitySaverSystem:init()
 
                         if nextPart then
                             if not handledParts[nextPart] then
-                                partData.connections[i] = savePart(nextPart)
+                                partData.connections[i] = savePart(nextPart, offsetX, offsetY)
                             else
                                 partData.connections[i] = 'parent'
                             end
@@ -59,7 +59,7 @@ function EntitySaverSystem:init()
             end
 
             for i, command in ipairs(self.entities) do
-                local entityData = savePart(command)
+                local entityData = savePart(command, command.transform.x, command.transform.y)
 
                 print(table.inspect(entityData))
 
@@ -69,40 +69,7 @@ function EntitySaverSystem:init()
     end)
 end
 
-
---{
---    name = 'player',
---    connections = {
---        [1] = {
---            name = 'connector1x1',
---            connections = {
---                [3] = {
---                    name = 'thruster',
---                },
---                [4] = {
---                    name = 'cannon',
---                }
---            },
---        },
---        [2] = {
---            name = 'connector1x1',
---            connections = {
---                [3] = {
---                    name = 'thruster',
---                },
---                [4] = {
---                    name = 'cannon',
---                }
---            },
---        },
---    }
---}
-
 ---------------
-
-local G = require('constants')
-local parts = require('parts')
-local beholder = require('beholder')
 
 local PartSpawnerSystem = ecs.processingSystem(class('PartSpawnerSystem'))
 
