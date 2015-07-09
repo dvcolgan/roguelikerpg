@@ -1,4 +1,5 @@
 local ecs = require('tiny')
+local debugDraw = require('physics-debugdraw')
 
 local ImageRenderingSystem = ecs.processingSystem(class 'ImageRenderingSystem')
 
@@ -22,6 +23,8 @@ function ImageRenderingSystem:process(entity, dt)
     else
         love.graphics.draw(image, drawX, drawY, 0, 1, 1, offsetX, offsetY)
     end
+
+    --debugDraw(physics.world, 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
 end
 
 return ImageRenderingSystem

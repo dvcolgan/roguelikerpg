@@ -11,15 +11,13 @@ end
 
 function PartWeldingSystem:onRemove(dragging)
     if dragging.dragging then 
-        local mountX = dragging.dragged.transform.x
-        local mountY = dragging.dragged.transform.y
+        local mountX, mountY = dragging.dragged:getWorldCoordinates()
 
         for i, entity in ipairs(self.entities) do
             if entity.isMountPoint and entity ~= dragging.dragged then
                 local mountPoint = entity
                 if mountPoint ~= dragging then
-                    local otherMountX = mountPoint.transform.x
-                    local otherMountY = mountPoint.transform.y
+                    local otherMountX, otherMountY = mountPoint:getWorldCoordinates()
 
                     local dist = vector.dist(
                         mountX, mountY, otherMountX, otherMountY

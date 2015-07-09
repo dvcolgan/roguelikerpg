@@ -2,9 +2,10 @@ local ecs = require('tiny')
 local PhysicsManager = require('physics-manager')
 local parts = require('parts')
 
-local GameState = class('GameState')
 local box2DSystems = require('systems/Box2DSystems')
 local mouseDragSystems = require('systems/MouseDragSystems')
+
+local GameState = class('GameState')
 
 function GameState:init()
     _G.physics = PhysicsManager()

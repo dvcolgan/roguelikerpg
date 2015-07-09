@@ -15,9 +15,10 @@ function MouseDragSystem:init()
             local mouseX, mouseY = love.mouse.getPosition()
 
             for i, draggable in ipairs(self.entities) do
+                local draggableX, draggableY = draggable:getWorldCoordinates()
                 local dist = vector.dist(
-                    draggable.transform.x,
-                    draggable.transform.y,
+                    draggableX,
+                    draggableY,
                     mouseX, mouseY
                 )
                 if closestDist == nil or dist < closestDist then

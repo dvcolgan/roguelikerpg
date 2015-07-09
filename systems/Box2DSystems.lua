@@ -8,7 +8,6 @@ function RevoluteJointSystem:init()
 end
 
 function RevoluteJointSystem:onAdd(connection)
-    print('connection')
     local object1 = physics.objects[connection.mountPoint1.part.uuid]
     local object2 = physics.objects[connection.mountPoint2.part.uuid]
 
@@ -18,9 +17,7 @@ function RevoluteJointSystem:onAdd(connection)
     -- right distance from each other
     -- also we need to make sure there isn't already a
     -- connection here
-    local mouseX, mouseY = love.mouse.getPosition()
-    local jointX = connection.mountPoint1.transform.x
-    local jointY = connection.mountPoint1.transform.y
+    local jointX, jointY = connection.mountPoint1:getWorldCoordinates()
     local joint = love.physics.newRevoluteJoint(
         object1.body,
         object2.body,
@@ -46,8 +43,7 @@ end
 
 function MouseJointSystem:onAdd(dragging)
     local object = physics.objects[dragging.dragged.part.uuid]
-    local mountX = dragging.dragged.transform.x
-    mountY = dragging.dragged.transform.y
+    local mountX, mountY = dragging.dragged:getWorldCoordinates()
     physics.mouseJoint = love.physics.newMouseJoint(object.body, mountX, mountY)
     physics.mouseJoint:setUserData(dragging)
 end
@@ -78,6 +74,7 @@ function RigidBodySystem:onAdd(entity)
         entity.transform.y,
         'dynamic'
     )
+    object.body:setAngle(entity.transform.angle)
     object.body:setLinearDamping(10)
     if entity.shape.kind == 'rectangle' then
         object.shape = love.physics.newRectangleShape(
@@ -111,15 +108,14 @@ function RigidBodySystem:process(entity, dt)
     entity.transform.x = object.body:getX()
     entity.transform.y = object.body:getY()
     entity.transform.angle = object.body:getAngle()
-    if entity.mountPoints then
-        for i, mountPoint in ipairs(entity.mountPoints) do
-            local object = physics.objects[entity.uuid]
-            local worldX, worldY = object.body:getWorldPoint(
-                mountPoint.offset.x, mountPoint.offset.y
-            )
-            mountPoint.transform.x = worldX
-            mountPoint.transform.y = worldY
-        end
+
+    love.graphics.setColor(255, 0, 0, 255)
+    for i, mountPoint in ipairs(entity.mountPoints) do
+        local x, y = mountPoint:getWorldCoordinates()
+        love.graphics.circle(
+            'fill',
+            x, y, 4, 10
+        )
     end
 end
 

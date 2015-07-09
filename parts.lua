@@ -1,4 +1,5 @@
 local util = require('util')
+local vector = require('vector')
 
 local MountPoint = class('MountPoint')
 function MountPoint:init(part, x, y)
@@ -10,13 +11,17 @@ function MountPoint:init(part, x, y)
         x = x,
         y = y,
     }
-    self.transform = {
-        x = 0,
-        y = 0,
-        angle = 0,
-    }
     self.connection = nil
     world:addEntity(self)
+end
+
+function MountPoint:getWorldCoordinates()
+    local rotatedX, rotatedY = vector.rotate(
+        self.part.transform.angle,
+        self.offset.x,
+        self.offset.y
+    )
+    return self.part.transform.x + rotatedX, self.part.transform.y + rotatedY
 end
 
 local Player = class('Player')

@@ -4,22 +4,37 @@ local PhysicsManager = require('physics-manager')
 
 local parts = require('parts')
 
+local box2DSystems = require('systems/Box2DSystems')
+local mouseDragSystems = require('systems/MouseDragSystems')
+local editorSystems = require('systems/EditorSystems')
+
+local factories = require('factories')
+local enemies = require('scenarios/prisonship/enemies')
+
 function GameState:init()
     _G.physics = PhysicsManager()
     _G.world = ecs.world()
 
     world:add(
+        box2DSystems.RigidBodySystem(),
+        box2DSystems.RevoluteJointSystem(),
+        box2DSystems.MouseJointSystem(),
+
+        mouseDragSystems.MouseDragSystem(),
+        mouseDragSystems.MouseDragReleaseSystem(),
+
+        require('systems.PartWeldingSystem')(),
         require('systems.ImageRenderingSystem')(),
         require('systems.WallSystem')(),
-        require('systems.MouseJointSystem')(),
-        require('systems.PositionSystem')(),
-        require('systems.MountPointDragSystem')(),
-        require('systems.EditorPartSpawnerSystem')(),
-        require('systems.EditorEntitySaverSystem')(),
-        require('systems.ConnectionSystem')()
-    )
 
-    local prefabs = require('prefabs')
+        editorSystems.EntityDeleteSystem(),
+        editorSystems.EntitySaverSystem(),
+        editorSystems.PartSpawnerSystem(),
+
+    nil)
+
+    factories.buildActor(enemies.drone)
+
     love.graphics.setBackgroundColor(255, 255, 255, 255)
 end
 

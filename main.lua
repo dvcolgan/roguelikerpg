@@ -31,7 +31,7 @@ function love.load()
         assets.images.editorBackground:getWidth(),
         assets.images.editorBackground:getHeight()
     )
-    game.state = require('states/test')()
+    game.state = require('states/entity-editor')()
 end
 
 function love.draw()

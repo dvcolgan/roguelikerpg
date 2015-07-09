@@ -42,11 +42,11 @@ function buildEntity(entityData)
     local part = parts[entityData.name]()
     local parentI = nil
 
-    part.position.x = entityData.x
-    part.position.y = entityData.y
-    part.position.angle = entityData.angle
-    print(part.position.angle)
-    world:addEntity(part)
+    part.transform.x = entityData.x
+    part.transform.y = entityData.y
+    part.transform.angle = entityData.angle
+    print(part.transform.angle)
+    world:addEntity(partransform)
     for i, childEntityData in pairs(entityData.connections) do
         if childEntityData == 'parent' then
             parentI = i
