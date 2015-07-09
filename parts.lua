@@ -1,5 +1,5 @@
 local util = require('util')
-local vector = require('vector')
+local vector = require('lib/vector')
 
 local MountPoint = class('MountPoint')
 function MountPoint:init(part, x, y)

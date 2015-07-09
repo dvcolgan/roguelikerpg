@@ -1,7 +1,7 @@
-local ecs = require('tiny')
-local vector = require('vector')
+local ecs = require('lib/tiny')
+local vector = require('lib/vector')
 local joints = require('joints')
-local beholder = require('beholder')
+local beholder = require('lib/beholder')
 
 local MouseDragSystem = ecs.processingSystem(class('MouseDragSystem'))
 

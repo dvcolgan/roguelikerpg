@@ -1,5 +1,5 @@
-local ecs = require('tiny')
-local vector = require('vector')
+local ecs = require('lib/tiny')
+local vector = require('lib/vector')
 local joints = require('joints')
 local G = require('constants')
 

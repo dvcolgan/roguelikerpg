@@ -1,4 +1,3 @@
-local class = require('middleclass')
 local G = require('constants')
 
 

@@ -1,4 +1,4 @@
-local ecs = require('tiny')
+local ecs = require('lib/tiny')
 
 
 local RevoluteJointSystem = ecs.processingSystem(class('RevoluteJointSystem'))

@@ -1,5 +1,5 @@
-local ecs = require('tiny')
-local debugDraw = require('physics-debugdraw')
+local ecs = require('lib/tiny')
+local debugDraw = require('lib/physics-debugdraw')
 
 local ImageRenderingSystem = ecs.processingSystem(class 'ImageRenderingSystem')
 

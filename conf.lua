@@ -1,8 +1,8 @@
 function love.conf(t)
 
     io.stdout:setvbuf("no")
-    _G.class = require('30log')
-    table.inspect = require('inspect')
+    _G.class = require('lib/30log')
+    table.inspect = require('lib/inspect')
     math.randomseed(os.time())
 
     t.identity = "roguelike"
@@ -11,8 +11,8 @@ function love.conf(t)
 
     t.window.title = "Roguelike"
     t.window.icon = nil
-    t.window.width = 64*15
-    t.window.height = 64*9
+    t.window.width = 24*40
+    t.window.height = 24*24
     t.window.borderless = false
     t.window.resizable = false
     t.window.fullscreen = false

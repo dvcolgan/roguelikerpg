@@ -1,5 +1,5 @@
 local GameState = class('GameState')
-local ecs = require('tiny')
+local ecs = require('lib/tiny')
 local PhysicsManager = require('physics-manager')
 
 local parts = require('parts')
@@ -32,9 +32,6 @@ function GameState:init()
         editorSystems.PartSpawnerSystem(),
 
     nil)
-
-    factories.buildActor(enemies.drone, 400, 300)
-    factories.buildActor(enemies.drone, 200, 100)
 
     love.graphics.setBackgroundColor(255, 255, 255, 255)
 end

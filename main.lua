@@ -1,4 +1,4 @@
-local beholder = require('beholder')
+local beholder = require('lib/beholder')
 
 local game = {
     images = nil,

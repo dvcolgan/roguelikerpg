@@ -1,5 +1,5 @@
-local ecs = require('tiny')
-local beholder = require('beholder')
+local ecs = require('lib/tiny')
+local beholder = require('lib/beholder')
 local parts = require('parts')
 local G = require('constants')
 
@@ -92,14 +92,14 @@ function PartSpawnerSystem:preProcess(dt)
     love.graphics.rectangle(
         'fill',
         0, 0,
-        G.TILE_SIZE,
+        64,
         love.graphics.getHeight()
     )
     love.graphics.setColor(255, 255, 255, 255)
     love.graphics.rectangle(
         'fill',
         0, 0,
-        G.TILE_SIZE - 4,
+        64 - 4,
         love.graphics.getHeight()
     )
 
@@ -112,9 +112,9 @@ end
 
 function PartSpawnerSystem:drawPartLabel(image, number)
     love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.draw(image, 6, 6 + (number - 1) * (G.TILE_SIZE - 8))
+    love.graphics.draw(image, 6, 6 + (number - 1) * (64 - 8))
     love.graphics.setColor(0, 0, 0, 255)
-    love.graphics.print(number, 1, 3 + (number - 1) * (G.TILE_SIZE - 8))
+    love.graphics.print(number, 1, 3 + (number - 1) * (64 - 8))
 end
 
 return {
