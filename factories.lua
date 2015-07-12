@@ -9,7 +9,6 @@ function factories.buildActor(entityData, x, y)
     part.transform.x = x + entityData.x
     part.transform.y = y + entityData.y
     part.transform.angle = entityData.angle
-    print(part.transform.angle)
     for i, childEntityData in pairs(entityData.connections) do
         if childEntityData == 'parent' then
             parentI = i

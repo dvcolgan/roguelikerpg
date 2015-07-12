@@ -25,7 +25,7 @@ function GameState:init()
 
         require('systems.PartWeldingSystem')(),
         require('systems.ImageRenderingSystem')(),
-        require('systems.WallSystem')(),
+        --require('systems.WallSystem')(),
 
         editorSystems.EntityDeleteSystem(),
         editorSystems.EntitySaverSystem(),
@@ -34,6 +34,12 @@ function GameState:init()
     nil)
 
     love.graphics.setBackgroundColor(255, 255, 255, 255)
+
+    for x=1, 50 do
+        for y=1, 50 do
+            factories.buildActor(enemies.drone, x * 300, y * 300)
+        end
+    end
 end
 
 function GameState:draw()

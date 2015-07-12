@@ -36,6 +36,8 @@ end
 
 function love.draw()
     if game.state.draw then game.state:draw() end
+    love.graphics.setColor(0, 0, 0, 255)
+    love.graphics.print(love.timer.getFPS(), love.graphics.getWidth() - 30, 10)
 end
 
 function love.update(dt)
