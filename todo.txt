@@ -1,3 +1,25 @@
+
+
+
+game is made up of rooms
+the rooms could have
+    an ecs for parts
+    physics thing based off of the ecs
+
+serialize and deserialize for the whole room state
+and you put the unloaded rooms into a file
+you just load the room on enter and save it on exit
+this also saves the game on every room enter
+
+at the beginning of the run, you could generate a file of every room
+
+
+
+
+
+
+
+
 if an enemy dies, all of the parts become loose
     if you punch a part it turns into gears
 

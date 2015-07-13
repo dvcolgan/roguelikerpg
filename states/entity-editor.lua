@@ -35,8 +35,8 @@ function GameState:init()
 
     love.graphics.setBackgroundColor(255, 255, 255, 255)
 
-    for x=1, 50 do
-        for y=1, 50 do
+    for x=1, 10 do
+        for y=1, 10 do
             factories.buildActor(enemies.drone, x * 300, y * 300)
         end
     end
