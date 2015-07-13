@@ -1,5 +1,3 @@
-local beholder = require('lib/beholder')
-
 local game = {
     images = nil,
     state = nil,
@@ -31,43 +29,51 @@ function love.load()
         assets.images.editorBackground:getWidth(),
         assets.images.editorBackground:getHeight()
     )
-    game.state = require('states/entity-editor')()
+    game.state = require('states/entity-editor'):new()
 end
 
 function love.draw()
-    if game.state.draw then game.state:draw() end
     love.graphics.setColor(0, 0, 0, 255)
     love.graphics.print(love.timer.getFPS(), love.graphics.getWidth() - 30, 10)
-end
-
-function love.update(dt)
-    if game.state.update then game.state:update(dt) end
+    if game.state then
+        game.state.ecs:update(love.timer.getDelta())
+    end
 end
 
 function love.keypressed(key)
     if key == 'escape' then
         love.event.quit()
     else
-        if key == ' ' then key = 'space' end
-        if key == ',' then key = 'comma' end
-        beholder.trigger('keyDown', key)
+        if game.state then
+            if key == ' ' then key = 'space' end
+            if key == ',' then key = 'comma' end
+            game.state.ecs:trigger('keyDown', key)
+        end
     end
 end
 
 function love.keyreleased(key)
-    if key == ' ' then key = 'space' end
-    if key == ',' then key = 'comma' end
-    beholder.trigger('keyUp', key)
+    if game.state then
+        if key == ' ' then key = 'space' end
+        if key == ',' then key = 'comma' end
+        game.state.ecs:trigger('keyUp', key)
+    end
 end
 
 function love.mousepressed(x, y, button)
-    beholder.trigger('mouseDown', x, y, button)
+    if game.state then
+        game.state.ecs:trigger('mouseDown', x, y, button)
+    end
 end
 
 function love.mousereleased(x, y, button)
-    beholder.trigger('mouseUp', x, y, button)
+    if game.state then
+        game.state.ecs:trigger('mouseUp', x, y, button)
+    end
 end
 
 function love.mousemoved(x, y, dx, dy)
-    beholder.trigger('mouseMove', x, y, dx, dy)
+    if game.state then
+        game.state.ecs:trigger('mouseMove', x, y, dx, dy)
+    end
 end

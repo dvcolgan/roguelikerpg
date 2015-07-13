@@ -1,9 +1,7 @@
-local ecs = require('tiny')
+local ShapeRenderingSystem = class('ShapeRenderingSystem')
 
-local ShapeRenderingSystem = ecs.processingSystem(class 'ShapeRenderingSystem')
-
-function ShapeRenderingSystem:init()
-    self.filter = ecs.requireAll('position', 'shape', 'color')
+function ShapeRenderingSystem:initialize()
+    self.components = {'position', 'shape', 'color'}
 end
 
 function ShapeRenderingSystem:process(entity, dt)

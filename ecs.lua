@@ -1,6 +1,6 @@
 local ECSEngine = class('ECSEngine')
 
-function ECSEngine:init()
+function ECSEngine:initialize()
     self.eventQueue = {}
     self.delayedEventQueue = {}
     self.eventCallbacks = {}
@@ -19,14 +19,15 @@ function ECSEngine:genUuid()
     end)
 end
 
-function ECSEngine:trigger(...)
-    table.insert(self.events, ...)
+function ECSEngine:trigger(eventName, arg1, arg2, arg3, arg4, arg5)
+    table.insert(self.eventQueue, {
+        eventName, arg1, arg2, arg3, arg4, arg5
+    })
 end
 
 function ECSEngine:addEntity(entity)
-    local uuid = self:genUuid()
-    self.entitiesToAdd[uuid] = entity
-    return uuid
+    entity.uuid = self:genUuid()
+    self.entitiesToAdd[entity.uuid] = entity
 end
 
 function ECSEngine:removeEntity(uuid)
@@ -38,18 +39,20 @@ function ECSEngine:addSystem(system)
     for key, value in pairs(system) do
         -- Register functions in the system as listeners if they start with 'on'
         if type(value) == 'function' and startsWith(key, 'on') then
+            print(key, value)
             -- Extract the action name from the function name:
             -- onCreateTodo -> createTodo
             local actionName = string.lower(string.sub(key, 3, 3)) .. string.sub(key, 4)
 
-            if self.callbacks[actionName] == nil then
-                self.callbacks[actionName] = {}
+            if self.eventCallbacks[actionName] == nil then
+                self.eventCallbacks[actionName] = {}
             end
-            table.insert(self.callbacks[actionName], function(...)
+            table.insert(self.eventCallbacks[actionName], function(...)
                 value(system, ...)
             end)
         end
     end
+    system.entities = {}
 end
 
 function ECSEngine:entityHasComponents(entity, components)
@@ -61,7 +64,7 @@ function ECSEngine:entityHasComponents(entity, components)
     return true
 end
 
-function Engine:pump(dt)
+function ECSEngine:processEvents(dt)
     for key, delayedEvent in pairs(self.delayedEventQueue) do
         delayedEvent.remaining = delayedEvent.remaining - dt
         if delayedEvent.remaining <= 0 then
@@ -80,9 +83,13 @@ function Engine:pump(dt)
         local arg3 = event[4]
         local arg4 = event[5]
         local arg5 = event[6]
+        --print(callbackName)
+        --print(table.inspect(self.eventCallbacks[callbackName]))
 
-        for _, callback in ipairs(self.callbacks) do
-            callback(arg1, arg2, arg3, arg4, arg5)
+        if self.eventCallbacks[callbackName] then
+            for _, callback in ipairs(self.eventCallbacks[callbackName]) do
+                callback(arg1, arg2, arg3, arg4, arg5)
+            end
         end
     end
 end
@@ -96,7 +103,7 @@ function ECSEngine:manageEntities()
     for i, uuid in ipairs(self.entitiesToRemove) do
         for _, system in pairs(self.systems) do
             if system.entities[uuid] then
-                if self.system.onRemove then self.system:onRemove(uuid, entity) end
+                if self.system.onRemove then self.system:onRemove(entity) end
                 system.entities[uuid] = nil
             end
         end
@@ -109,9 +116,11 @@ function ECSEngine:manageEntities()
         if self.entities[uuid] == nil then
             self.entities[uuid] = entity
             for _, system in pairs(self.systems) do
-                if self:entityHasComponents(entity, system.components) then
-                    system.entities[uuid] = entity
-                    if system.onAdd then system:onAdd(uuid, entity) end
+                if system.components then
+                    if self:entityHasComponents(entity, system.components) then
+                        system.entities[uuid] = entity
+                        if system.onAdd then system:onAdd(entity) end
+                    end
                 end
             end
         end
@@ -126,8 +135,8 @@ function ECSEngine:update(dt)
     for i, system in ipairs(self.systems) do
         if system.preProcess then system:preProcess(dt) end
         if system.process then
-            for uuid, entity in pairs(self.entities) do
-                system:process(uuid, entity, dt)
+            for uuid, entity in pairs(system.entities) do
+                system:process(entity, dt)
             end
         end
         if system.postProcess then system:postProcess(dt) end

@@ -1,85 +1,82 @@
-local ecs = require('lib/tiny')
-local beholder = require('lib/beholder')
 local parts = require('parts')
 local G = require('constants')
 
-local EntityDeleteSystem = ecs.processingSystem(class('EntityDeleteSystem'))
+local EntityDeleteSystem = class('EntityDeleteSystem')
 
-function EntityDeleteSystem:init()
-    self.filter = ecs.requireAll('isPart', 'isCommand')
-    beholder.observe('mouseDown', function(button)
-        if button == 'r' then
-            print('delete thing under cursor')
-        end
-    end)
+function EntityDeleteSystem:initialize()
+    self.components = {'isPart', 'isCommand'}
+end
+
+function EntityDeleteSystem:onMouseDown(button)
+    if button == 'r' then
+        print('delete thing under cursor')
+    end
 end
 
 ---------------
 
-local EntitySaverSystem = ecs.processingSystem(class('EntitySaverSystem'))
+local EntitySaverSystem = class('EntitySaverSystem')
 
-function EntitySaverSystem:init()
-    self.filter = ecs.requireAll('isPart', 'isCommand')
-    beholder.observe('keyDown', function(key)
-        if key == 's' then
+function EntitySaverSystem:initialize()
+    self.components = {'isPart', 'isCommand'}
+end
 
-            local unhandledParts = {}
-            local handledParts = {}
+function EntitySaverSystem:onKeyDown(key)
+    if key == 's' then
+        local unhandledParts = {}
+        local handledParts = {}
 
-            function savePart(part, offsetX, offsetY)
-                handledParts[part] = true
-                local partData = {
-                    name = part.name,
-                    x = part.transform.x - offsetX,
-                    y = part.transform.y - offsetY,
-                    angle = part.transform.angle,
-                    connections = {}
-                }
-                for i, mountPoint in ipairs(part.mountPoints) do
-                    if mountPoint.connection then
-                        local part1 = mountPoint.connection.mountPoint1.part
-                        local part2 = mountPoint.connection.mountPoint2.part
-                        local nextPart = nil
-                        if part1 ~= part then
-                            nextPart = part1
-                        elseif part2 ~= part then
-                            nextPart = part2
-                        end
+        function savePart(part, offsetX, offsetY)
+            handledParts[part] = true
+            local partData = {
+                name = part.name,
+                x = part.transform.x - offsetX,
+                y = part.transform.y - offsetY,
+                angle = part.transform.angle,
+                connections = {}
+            }
+            for i, mountPoint in ipairs(part.mountPoints) do
+                if mountPoint.connection then
+                    local part1 = mountPoint.connection.mountPoint1.part
+                    local part2 = mountPoint.connection.mountPoint2.part
+                    local nextPart = nil
+                    if part1 ~= part then
+                        nextPart = part1
+                    elseif part2 ~= part then
+                        nextPart = part2
+                    end
 
-                        if nextPart then
-                            if not handledParts[nextPart] then
-                                partData.connections[i] = savePart(nextPart, offsetX, offsetY)
-                            else
-                                partData.connections[i] = 'parent'
-                            end
+                    if nextPart then
+                        if not handledParts[nextPart] then
+                            partData.connections[i] = savePart(nextPart, offsetX, offsetY)
+                        else
+                            partData.connections[i] = 'parent'
                         end
                     end
                 end
-                return partData
             end
-
-            for i, command in ipairs(self.entities) do
-                local entityData = savePart(command, command.transform.x, command.transform.y)
-
-                print(table.inspect(entityData))
-
-                break
-            end
+            return partData
         end
-    end)
+
+        for i, command in ipairs(self.entities) do
+            local entityData = savePart(command, command.transform.x, command.transform.y)
+
+            print(table.inspect(entityData))
+
+            break
+        end
+    end
 end
 
 ---------------
 
-local PartSpawnerSystem = ecs.processingSystem(class('PartSpawnerSystem'))
+local PartSpawnerSystem = class('PartSpawnerSystem')
 
-function PartSpawnerSystem:init()
-
-    beholder.observe('keyDown', function(key)
-    end)
+function PartSpawnerSystem:initialize()
 end
 
 function PartSpawnerSystem:onKeyDown(key)
+    print(key)
     local spawnX, spawnY = love.mouse.getPosition()
     local partClass = nil
     if key == '1' then partClass = parts.Player end

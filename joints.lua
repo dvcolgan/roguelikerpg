@@ -1,19 +1,15 @@
 local util = require('util')
 
 local Dragging = class('Dragging')
-function Dragging:init(dragged)
-    self.uuid = util.uuid()
+function Dragging:initialize(dragged)
     self.dragged = dragged
     self.dragging = true
-    world:addEntity(self)
 end
 
 local Connection = class('Connection')
-function Connection:init(mountPoint1, mountPoint2)
-    self.uuid = util.uuid()
+function Connection:initialize(mountPoint1, mountPoint2)
     self.mountPoint1 = mountPoint1
     self.mountPoint2 = mountPoint2
-    world:addEntity(self)
 end
 
 return {

@@ -1,5 +1,4 @@
-local GameState = class('GameState')
-local ecs = require('lib/tiny')
+local ECSEngine = require('ecs')
 local PhysicsManager = require('physics-manager')
 
 local parts = require('parts')
@@ -11,45 +10,31 @@ local editorSystems = require('systems/EditorSystems')
 local factories = require('factories')
 local enemies = require('scenarios/prisonship/enemies')
 
-function GameState:init()
-    _G.physics = PhysicsManager()
-    _G.world = ecs.world()
+local GameState = class('GameState')
+function GameState:initialize()
+    self.physics = PhysicsManager:new()
+    print(self.physics)
+    self.ecs = ECSEngine:new()
 
-    world:add(
-        box2DSystems.RigidBodySystem(),
-        box2DSystems.RevoluteJointSystem(),
-        box2DSystems.MouseJointSystem(),
+    self.ecs:addSystem(box2DSystems.RigidBodySystem:new(self.physics))
+    self.ecs:addSystem(box2DSystems.RevoluteJointSystem:new(self.physics))
+    self.ecs:addSystem(box2DSystems.MouseJointSystem:new(self.physics))
+    self.ecs:addSystem(require('systems.WallSystem'):new(self.physics))
 
-        mouseDragSystems.MouseDragSystem(),
-        mouseDragSystems.MouseDragReleaseSystem(),
+    self.ecs:addSystem(mouseDragSystems.MouseDragSystem:new())
+    self.ecs:addSystem(mouseDragSystems.MouseDragReleaseSystem:new())
 
-        require('systems.PartWeldingSystem')(),
-        require('systems.ImageRenderingSystem')(),
-        --require('systems.WallSystem')(),
+    self.ecs:addSystem(require('systems.PartWeldingSystem'):new())
+    self.ecs:addSystem(require('systems.ImageRenderingSystem'):new())
 
-        editorSystems.EntityDeleteSystem(),
-        editorSystems.EntitySaverSystem(),
-        editorSystems.PartSpawnerSystem(),
-
-    nil)
+    self.ecs:addSystem(editorSystems.EntityDeleteSystem:new())
+    self.ecs:addSystem(editorSystems.EntitySaverSystem:new())
+    self.ecs:addSystem(editorSystems.PartSpawnerSystem:new())
 
     love.graphics.setBackgroundColor(255, 255, 255, 255)
 
-    for x=1, 10 do
-        for y=1, 10 do
-            factories.buildActor(enemies.drone, x * 300, y * 300)
-        end
-    end
-end
-
-function GameState:draw()
-    love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.draw(
-        assets.images.editorBackground,
-        assets.images.editorBackgroundQuad,
-        0, 0
-    )
-    world:update(love.timer.getDelta())
+    factories.buildActor(enemies.scout, 450, 300)
+    factories.buildActor(enemies.drone, 300, 300)
 end
 
 return GameState

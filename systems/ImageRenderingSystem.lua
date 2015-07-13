@@ -1,10 +1,9 @@
-local ecs = require('lib/tiny')
 local debugDraw = require('lib/physics-debugdraw')
 
-local ImageRenderingSystem = ecs.processingSystem(class 'ImageRenderingSystem')
+local ImageRenderingSystem = class 'ImageRenderingSystem'
 
-function ImageRenderingSystem:init()
-    self.filter = ecs.requireAll('transform', 'image')
+function ImageRenderingSystem:initialize()
+    self.components = {'transform', 'image'}
 end
 
 function ImageRenderingSystem:preProcess()

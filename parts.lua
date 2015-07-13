@@ -2,8 +2,7 @@ local util = require('util')
 local vector = require('lib/vector')
 
 local MountPoint = class('MountPoint')
-function MountPoint:init(part, x, y)
-    self.uuid = util.uuid()
+function MountPoint:initialize(part, x, y)
     self.draggable = true
     self.isMountPoint = true
     self.part = part
@@ -12,7 +11,6 @@ function MountPoint:init(part, x, y)
         y = y,
     }
     self.connection = nil
-    world:addEntity(self)
 end
 
 function MountPoint:getWorldCoordinates()
@@ -25,8 +23,7 @@ function MountPoint:getWorldCoordinates()
 end
 
 local Player = class('Player')
-function Player:init(x, y)
-    self.uuid = util.uuid()
+function Player:initialize(x, y)
     self.transform = {
         x = x,
         y = y,
@@ -47,13 +44,10 @@ function Player:init(x, y)
     self.image = 'player'
     self.isPart = true
     self.isCommand = true
-
-    world:addEntity(self)
 end
 
 local Enemy = class('Enemy')
-function Enemy:init(x, y)
-    self.uuid = util.uuid()
+function Enemy:initialize(x, y)
     self.transform = {
         x = x,
         y = y,
@@ -74,13 +68,10 @@ function Enemy:init(x, y)
     self.image = 'enemy'
     self.isPart = true
     self.isCommand = true
-
-    world:addEntity(self)
 end
 
 local Connector1x1 = class('Connector1x1')
-function Connector1x1:init(x, y)
-    self.uuid = util.uuid()
+function Connector1x1:initialize(x, y)
     self.transform = {
         x = x,
         y = y,
@@ -100,12 +91,10 @@ function Connector1x1:init(x, y)
     }
     self.image = 'connector1x1'
     self.isPart = true
-    world:addEntity(self)
 end
 
 local Connector2x1 = class('Connector2x1')
-function Connector2x1:init(x, y)
-    self.uuid = util.uuid()
+function Connector2x1:initialize(x, y)
     self.transform = {
         x = x,
         y = y,
@@ -127,12 +116,10 @@ function Connector2x1:init(x, y)
     }
     self.image = 'connector2x1'
     self.isPart = true
-    world:addEntity(self)
 end
 
 local Cannon = class('Cannon')
-function Cannon:init(x, y)
-    self.uuid = util.uuid()
+function Cannon:initialize(x, y)
     self.transform = {
         x = x,
         y = y,
@@ -149,12 +136,10 @@ function Cannon:init(x, y)
     self.physics = true
     self.image = 'cannon'
     self.isPart = true
-    world:addEntity(self)
 end
 
 local Thruster = class('Thruster')
-function Thruster:init(x, y)
-    self.uuid = util.uuid()
+function Thruster:initialize(x, y)
     self.transform = {
         x = x,
         y = y,
@@ -170,7 +155,6 @@ function Thruster:init(x, y)
     self.physics = true
     self.image = 'thruster'
     self.isPart = true
-    world:addEntity(self)
 end
 
 return {

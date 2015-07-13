@@ -2,7 +2,7 @@ local ecs = require('tiny')
 
 local ActorSpawnSystem = ecs.processingSystem(class('ActorSpawnSystem'))
 
-function ActorSpawnSystem:init()
+function ActorSpawnSystem:initialize()
     self.filter = ecs.requireAll()
 
     beholder.observe('

@@ -1,15 +1,16 @@
 local ecs = require('lib/tiny')
 
 
-local RevoluteJointSystem = ecs.processingSystem(class('RevoluteJointSystem'))
+local RevoluteJointSystem = class('RevoluteJointSystem')
 
-function RevoluteJointSystem:init()
-    self.filter = ecs.requireAll('uuid', 'mountPoint1', 'mountPoint2')
+function RevoluteJointSystem:initialize(physics)
+    self.components = {'uuid', 'mountPoint1', 'mountPoint2'}
+    self.physics = physics
 end
 
 function RevoluteJointSystem:onAdd(connection)
-    local object1 = physics.objects[connection.mountPoint1.part.uuid]
-    local object2 = physics.objects[connection.mountPoint2.part.uuid]
+    local object1 = self.physics.objects[connection.mountPoint1.part.uuid]
+    local object2 = self.physics.objects[connection.mountPoint2.part.uuid]
 
     -- Two problems: it should use the positions of
     -- the nubbins and not the mouse, and it should
@@ -24,52 +25,54 @@ function RevoluteJointSystem:onAdd(connection)
         jointX, jointY,
         true
     )
-    physics.joints[connection.uuid] = joint
+    self.physics.joints[connection.uuid] = joint
 end
 
 function RevoluteJointSystem:onRemove(connection)
-    local joint = physics.joints[connection.uuid]
+    local joint = self.physics.joints[connection.uuid]
     joint:destroy()
-    physics.joints[connection.uuid] = nil
+    self.physics.joints[connection.uuid] = nil
 end
 
 ---------------
 
-local MouseJointSystem = ecs.processingSystem(class('MouseJointSystem'))
+local MouseJointSystem = class('MouseJointSystem')
 
-function MouseJointSystem:init()
-    self.filter = ecs.requireAll('uuid', 'dragged', 'dragging')
+function MouseJointSystem:initialize(physics)
+    self.components = {'uuid', 'dragged', 'dragging'}
+    self.physics = physics
 end
 
 function MouseJointSystem:onAdd(dragging)
-    local object = physics.objects[dragging.dragged.part.uuid]
+    local object = self.physics.objects[dragging.dragged.part.uuid]
     local mountX, mountY = dragging.dragged:getWorldCoordinates()
-    physics.mouseJoint = love.physics.newMouseJoint(object.body, mountX, mountY)
-    physics.mouseJoint:setUserData(dragging)
+    self.physics.mouseJoint = love.physics.newMouseJoint(object.body, mountX, mountY)
+    self.physics.mouseJoint:setUserData(dragging)
 end
 
 function MouseJointSystem:onRemove(dragging)
-    physics.mouseJoint:destroy()
-    physics.mouseJoint = nil
+    self.physics.mouseJoint:destroy()
+    self.physics.mouseJoint = nil
     world:removeEntity(dragging)
 end
 
 function MouseJointSystem:process(dragging, dt)
-    physics.mouseJoint:setTarget(love.mouse.getPosition())
+    self.physics.mouseJoint:setTarget(love.mouse.getPosition())
 end
 
 ---------------
 
-local RigidBodySystem = ecs.processingSystem(class('RigidBodySystem'))
+local RigidBodySystem = class('RigidBodySystem')
 
-function RigidBodySystem:init()
-    self.filter = ecs.requireAll('uuid', 'physics', 'transform', 'shape')
+function RigidBodySystem:initialize(physics)
+    self.components = {'uuid', 'physics', 'transform', 'shape'}
+    self.physics = physics
 end
 
 function RigidBodySystem:onAdd(entity)
     local object = {}
     object.body = love.physics.newBody(
-        physics.world,
+        self.physics.world,
         entity.transform.x,
         entity.transform.y,
         'dynamic'
@@ -90,21 +93,21 @@ function RigidBodySystem:onAdd(entity)
     object.fixture:setRestitution(0.2)
     object.fixture:setUserData(entity)
 
-    physics.objects[entity.uuid] = object
+    self.physics.objects[entity.uuid] = object
 end
 
 function RigidBodySystem:onRemove(entity)
-    local object = physics.objects[entity.uuid]
+    local object = self.physics.objects[entity.uuid]
     object.body:destroy()
-    physics.objects[entity.uuid] = nil
+    self.physics.objects[entity.uuid] = nil
 end
 
 function RigidBodySystem:preProcess(dt)
-    physics.world:update(dt)
+    self.physics.world:update(dt)
 end
 
 function RigidBodySystem:process(entity, dt)
-    local object = physics.objects[entity.uuid]
+    local object = self.physics.objects[entity.uuid]
     entity.transform.x = object.body:getX()
     entity.transform.y = object.body:getY()
     entity.transform.angle = object.body:getAngle()

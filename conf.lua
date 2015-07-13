@@ -1,7 +1,7 @@
 function love.conf(t)
 
     io.stdout:setvbuf("no")
-    _G.class = require('lib/30log')
+    _G.class = require('lib/middleclass')
     table.inspect = require('lib/inspect')
     math.randomseed(os.time())
 

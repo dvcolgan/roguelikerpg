@@ -1,8 +1,8 @@
-local ecs = require('lib/tiny')
-local WallSystem = ecs.processingSystem(class('WallSystem'))
+local WallSystem = class('WallSystem')
 
-function WallSystem:init()
+function WallSystem:initialize(physics)
     self.walls = {}
+    self.physics = physics
 
     local roomWidth = love.graphics.getWidth()
     local roomHeight = love.graphics.getHeight()
@@ -13,7 +13,7 @@ function WallSystem:init()
         {x = roomWidth + 10, y = roomHeight / 2, width = 10, height = roomHeight},
     }) do
         local wall = {}
-        wall.body = love.physics.newBody(physics.world, template.x, template.y)
+        wall.body = love.physics.newBody(self.physics.world, template.x, template.y)
         wall.shape = love.physics.newRectangleShape(template.width, template.height)
         wall.fixture = love.physics.newFixture(wall.body, wall.shape)
         table.insert(self.walls, wall)
